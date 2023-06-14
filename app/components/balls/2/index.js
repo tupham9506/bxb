@@ -19,14 +19,20 @@ function Ball2 (config = {}) {
   self.container.x = config.x || 0;
   self.container.y = config.y || 0;
 
-  self.ball = PIXI.Sprite.from(namespace + 'ball.svg');
+  const ballTexture = PIXI.Texture.from(namespace + 'ball.svg');
+  const ballS2Texture = PIXI.Texture.from(namespace + 'ball-s2.svg');
+  const ballS4Texture = PIXI.Texture.from(namespace + 'ball-s4.svg');
+
+  self.ball = new PIXI.Sprite(ballTexture);
   self.ball.width = $10_point;
   self.ball.height = $10_point;
   self.ball.anchor.set(0.5);
 
-  self.weapon = PIXI.Sprite.from(namespace + 'weapon.svg');
+  const weaponTexture = PIXI.Texture.from(namespace + 'weapon.svg');
+  const weaponS4Texture = PIXI.Texture.from(namespace + 'weapon-s4.svg');
+  self.weapon = new PIXI.Sprite(weaponTexture);
   self.weapon.width = $5_point;
-  self.weapon.height = $20_point;
+  self.weapon.height = $15_point;
   self.weapon.x = +self.ball.width/2;
   self.weapon.anchor.set(0.5, 0);
 
@@ -39,7 +45,6 @@ function Ball2 (config = {}) {
   // Controll define
   self.ctrl.left = () => {
     if (self.container.x <= 0) return;
-    if (self.isLockMove) return;
     self.container.x -= self.speed;
     self.direct = ['x', -1];
     $command({
@@ -54,7 +59,6 @@ function Ball2 (config = {}) {
 
   self.ctrl.right = () => {
     if (self.container.x + self.ball.width >= $pixi.screen.width) return;
-    if (self.isLockMove) return;
     self.container.x += self.speed;
     self.direct = ['x', +1];
     $command({
@@ -69,7 +73,6 @@ function Ball2 (config = {}) {
   
   self.ctrl.up = () => {
     if (self.container.y <= 0) return;
-    if (self.isLockMove) return;
     self.container.y -= self.speed;
     self.direct = ['y', -1];
     $command({
@@ -84,7 +87,6 @@ function Ball2 (config = {}) {
 
   self.ctrl.down = () => {
     if (self.container.y + self.ball.height >= $pixi.screen.height) return;
-    if (self.isLockMove) return;
     self.container.y += self.speed;
     self.direct = ['y', +1];
     $command({
@@ -98,6 +100,12 @@ function Ball2 (config = {}) {
   }
 
   self.ctrl.move = (data) => {
+    if (self.isLockMove) {
+      currentMove = null;
+      cancelAnimationFrame(currentMoveId);
+      return
+    };
+
     if (!self.isAtk) {
       self.buildWeaponPosition();
     }
@@ -110,7 +118,6 @@ function Ball2 (config = {}) {
       return;
     }
     if (currentMove === data.key) return;
-
 
     currentMove = data.key;
     currentMoveId = requestAnimationFrame(self.ctrl[data.key]);
@@ -145,7 +152,7 @@ function Ball2 (config = {}) {
       title: data.hp,
       style: {
         fill: '0xFF0000',
-        fontSize: $2_point
+        fontSize: data.isCrit ? $4_point : $2_point
       }
     })
 
@@ -184,9 +191,10 @@ function Ball2 (config = {}) {
   // S1
   const s1 = {
     isEnabled: true,
-    atk: 90,
-    speed: 5,
-    angle: 90
+    atk: 100,
+    speed: 7,
+    angle: 75,
+    endTime: 500
   }
 
   self.ctrl.s1 = () => {
@@ -204,8 +212,14 @@ function Ball2 (config = {}) {
     
     let count = 0;
     var isHit = false;
-    const currenDirect = [...self.direct];
+    const crit = $helper.getRandomFrom(s3.critMin, s3.critMax);
+    const isCrit = crit > s3.critMax / 2;
+    if (isCrit) {
+      self.weapon.texture = weaponS4Texture;
+    }
 
+    const currenDirect = [...self.direct];
+    
     requestAnimationFrame(function start () {
       if (!isHit) {
         for (let i in $players) {
@@ -215,7 +229,8 @@ function Ball2 (config = {}) {
           if (config.isMe && isHit) {
             $command({
               name: 'hp',
-              hp: -s1.atk,
+              hp: -(s1.atk + crit),
+              isCrit: isCrit,
               userId: i,
             });
             break;
@@ -227,9 +242,15 @@ function Ball2 (config = {}) {
       count += s1.speed;
 
       if (count >= s1.angle) {
-        s1.isEnabled = true;
-        self.isAtk = false;
-        self.buildWeaponPosition()
+        setTimeout(() => {
+          s1.isEnabled = true;
+          self.isAtk = false;
+          self.buildWeaponPosition()
+          if (isCrit && !s4.isRun) {
+            self.weapon.texture = weaponTexture;
+          }
+        }, s1.endTime)
+        
         return true;
       }
       
@@ -243,16 +264,10 @@ function Ball2 (config = {}) {
 
   // S2
   const s2 = {
-    src: PIXI.Sprite.from(namespace + 's2.svg'),
     isEnabled: true,
-    atk: 10,
-    speed: $1_point,
-    range: $100_point
+    defPercent: 80,
+    time: 2000
   }
-
-  s2.src.width = $10_point;
-  s2.src.height = $10_point;
-  s2.src.anchor.set(0.5);
 
   self.ctrl.s2 = () => {
     if (config.isMe) {
@@ -263,145 +278,30 @@ function Ball2 (config = {}) {
         userId: window.userId,
         name: 's2'
       })
-      s2.isEnabled = false;
+      self.isLockMove = true;
     }
-    
-    const currenDirect = [...self.direct];
-    const anchor = $helper.anchor(self.container, self.ball, currenDirect, s2.src)
-    s2.src.x = anchor.x;
-    s2.src.y = anchor.y;
-    s2.src.angle = $helper.angleByDirect(currenDirect);
-    $pixi.stage.addChild(s2.src);
+    s2.isEnabled = false;
 
-    let count = 0;
-    var isHit = false;
-
-    requestAnimationFrame(function start () {
-      if (!isHit) {
-        for (let i in $players) {
-          if (i == config.userId) continue;
-          isHit = $helper.isHit(s2.src, $players[i].ball.ball);
-
-          if (config.isMe && isHit) {
-            $command({
-              name: 'hp',
-              hp: -s2.atk,
-              userId: i,
-            });
-            break;
-          };
-        }
-      }
-
-      s2.src[currenDirect[0]] = s2.src[currenDirect[0]] + currenDirect[1] * s2.speed;
-
-      count += s2.speed;
-      if (isHit || count >= s2.range) {
-        $pixi.stage.removeChild(s2.src);
-        if (count >= $50_point) {
-          s2.isEnabled = true;
-          self.buildWeaponPosition();
-          return true;
-        }
-      }
-      
-      requestAnimationFrame(start);
-    })
+    self.ball.texture = ballS2Texture;
+    setTimeout(() => {
+      self.ball.texture = ballTexture;
+      self.isLockMove = false;
+      s2.isEnabled = true;
+    }, s2.time);
+ 
   };
 
   self.command.s2 = () => {
     self.ctrl.s2();
   }
 
-  // S3
+  // S3: passive
   const s3 = {
-    src: PIXI.Sprite.from(namespace + 's3.svg'),
-    isEnabled: true,
-    atk: 150,
-    speed: $1_point,
-    range: $40_point,
-    endSrc: PIXI.Sprite.from(namespace + 's3-end.svg'),
-    endSize: $20_point,
-    endTime: 1,
+    critMin: 0,
+    critMax: 50
   }
 
-  s3.src.width = $10_point;
-  s3.src.height = $10_point;
-  s3.src.anchor.set(0.5);
-  s3.endSrc.width = $10_point;
-  s3.endSrc.height = $10_point;
-  s3.endSrc.anchor.set(0.5);
-
-  self.ctrl.s3 = () => {
-    if (config.isMe) {
-      if (!s3.isEnabled) return;
-      if (self.isLockSkill) return;
-  
-      $command({
-        userId: window.userId,
-        name: 's3'
-      })
-      s3.isEnabled = false;
-    }
-    
-    const currenDirect = [...self.direct];
-    const anchor = $helper.anchor(self.container, self.ball, currenDirect, s3.src)
-    s3.src.x = anchor.x;
-    s3.src.y = anchor.y;
-    s3.src.angle = $helper.angleByDirect(currenDirect);
-    $pixi.stage.addChild(s3.src);
-
-    let count = 0;
-    var isHit = false;
-
-    requestAnimationFrame(function start () {
-      s3.src[currenDirect[0]] = s3.src[currenDirect[0]] + currenDirect[1] * s3.speed;
-      s3.src.rotation += .1;
-
-      count += s3.speed;
-      if (count >= s3.range) {
-        $pixi.stage.removeChild(s3.src);
-        s3.endSrc.x = s3.src.x;
-        s3.endSrc.y = s3.src.y
-        requestAnimationFrame(end);
-        return true;
-      }
-      
-      requestAnimationFrame(start);
-    })
-
-    function end () {
-      $pixi.stage.addChild(s3.endSrc);
-      if (!isHit) {
-        for (let i in $players) {
-          if (i == config.userId) continue;
-          isHit = $helper.isHit(s3.endSrc, $players[i].ball.ball);
-          if (config.isMe && isHit) {
-            $command({
-              name: 'hp',
-              hp: -s3.atk,
-              userId: i,
-            });
-            break;
-          };
-        }
-      }
-
-      s3.endSrc.width += 0.5*$1_point;
-      s3.endSrc.height += 0.5*$1_point;
-
-      if (s3.endSrc.width >= s3.endSize) {
-        setTimeout(() => {
-          $pixi.stage.removeChild(s3.endSrc);
-          s3.endSrc.width = $10_point;
-          s3.endSrc.height = $10_point;
-          s3.isEnabled = true;
-        }, s3.endTime * 1000)
-        return true;
-      }
-      requestAnimationFrame(end);
-    }
-  };
+  self.ctrl.s3 = () => {};
 
   self.command.s3 = () => {
     self.ctrl.s3();
@@ -409,67 +309,56 @@ function Ball2 (config = {}) {
 
   // S4
   const s4 = {
-    src: PIXI.Sprite.from(namespace + 's4.svg'),
     isEnabled: true,
-    atk: 500,
-    speed: $2_point
+    isRun: false,
+    speedUp: $2_point,
+    speedUpEnd: 1.2 * $point,
+    speedUpTime: 1000,
+    time: 9000,
+    weaponWidth: $6_point,
+    weaponHeight: $20_point,
+    s1Atk: 130
   }
-
-  s4.src.width = $40_point;
-  s4.src.height = $40_point;
-  s4.src.anchor.set(0.5);
 
   self.ctrl.s4 = () => {
     if (config.isMe) {
       if (!s4.isEnabled) return;
       if (self.isLockSkill) return;
-  
       $command({
         userId: window.userId,
         name: 's4'
       })
       s4.isEnabled = false;
+      s2.isEnabled = false;
     }
-    
-    const currenDirect = [...self.direct];
-    const anchor = $helper.anchor(self.container, self.ball, currenDirect, s4.src)
-    s4.src.x = anchor.x;
-    s4.src.y = anchor.y;
-    s4.src.angle = $helper.angleByDirect(currenDirect);
-    $pixi.stage.addChild(s4.src);
-    $pixi.renderer.backgroundColor = '#000000';
-    let count = 0;
-    var isHit = false;
+    s4.isRun = true;
+    const weaponWidthOrg = self.weapon.width;
+    const weaponheightOrg = self.weapon.height;
+    const s1AtkOld = s1.atk;
 
-    requestAnimationFrame(function start () {
-      if (!isHit) {
-        for (let i in $players) {
-          if (i == config.userId) continue;
-          isHit = $helper.isHit(s4.src, $players[i].ball.ball);
-          if (config.isMe && isHit) {
-            $command({
-              name: 'hp',
-              hp: -s4.atk,
-              userId: i,
-            });
-            break;
-          };
-        }
-      }
+    self.weapon.texture = weaponS4Texture;
+    self.ball.texture = ballS4Texture;
+    self.weapon.width = s4.weaponWidth;
+    self.weapon.height = s4.weaponHeight;
+    s1.atk = s4.s1Atk;
 
-      s4.src[currenDirect[0]] = s4.src[currenDirect[0]] + currenDirect[1] * s4.speed;
-      count += s4.speed;
-      if (isHit || count >= 2*$100_point) {
-        $pixi.stage.removeChild(s4.src);
-        if (count >= $100_point) {
-          s4.isEnabled = true;
-          $pixi.renderer.backgroundColor = '#FFFFFF';
-          return true;
-        }
-      }
-      
-      requestAnimationFrame(start);
-    })
+    // Speed up
+    const speedOrg = self.speed
+    self.speed = s4.speedUp;
+    setTimeout(() => {
+      self.speed = s4.speedUpEnd;
+    }, s4.speedUpTime);
+
+    setTimeout(() => {
+      s4.isRun = false;
+      self.weapon.texture = weaponTexture;
+      self.ball.texture = ballTexture;
+      self.weapon.width = weaponWidthOrg;
+      self.weapon.height = weaponheightOrg;
+      self.speed = speedOrg;
+      s1.atk = s1AtkOld;
+      s2.isEnabled = true;
+    }, s4.time);
   };
 
   self.command.s4 = () => {

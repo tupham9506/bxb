@@ -46,7 +46,6 @@ function Ball1 (config = {}) {
 
   self.ctrl.right = () => {
     if (self.container.x + self.ball.width >= $pixi.screen.width) return;
-    if (self.isLockMove) return;
     self.container.x += self.speed;
     self.direct = ['x', +1];
     $command({
@@ -61,7 +60,6 @@ function Ball1 (config = {}) {
   
   self.ctrl.up = () => {
     if (self.container.y <= 0) return;
-    if (self.isLockMove) return;
     self.container.y -= self.speed;
     self.direct = ['y', -1];
     $command({
@@ -76,7 +74,6 @@ function Ball1 (config = {}) {
 
   self.ctrl.down = () => {
     if (self.container.y + self.ball.height >= $pixi.screen.height) return;
-    if (self.isLockMove) return;
     self.container.y += self.speed;
     self.direct = ['y', +1];
     $command({
@@ -90,6 +87,12 @@ function Ball1 (config = {}) {
   }
 
   self.ctrl.move = (data) => {
+    if (self.isLockMove) {
+      currentMove = null;
+      cancelAnimationFrame(currentMoveId);
+      return
+    };
+
     if (currentMove && data.key != currentMove) {
       cancelAnimationFrame(currentMoveId);
     }
@@ -133,7 +136,7 @@ function Ball1 (config = {}) {
       title: data.hp,
       style: {
         fill: '0xFF0000',
-        fontSize: $2_point
+        fontSize: data.isCrit ? $4_point : $2_point
       }
     })
 
@@ -236,7 +239,7 @@ function Ball1 (config = {}) {
   const s2 = {
     src: PIXI.Sprite.from(namespace + 's2.svg'),
     isEnabled: true,
-    atk: 10,
+    atk: 50,
     speed: $1_point,
     range: $100_point
   }

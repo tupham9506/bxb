@@ -25,7 +25,7 @@ $helper = {
     if (direct[1] === -1) return {
       x: element.x,
       y: -element.height/2,
-      angle: 45
+      angle: -135
     };
     return {
       x: element.x,
@@ -79,8 +79,7 @@ $helper = {
     }
     return null;
   },
-  degreeToRadian: (degrees) => {
-    var pi = Math.PI;
-    return degrees * (pi/180);
+  getRandomFrom: (min, max) => {
+    return Math.floor(Math.random() * (max - min) + min);
   }
 }
