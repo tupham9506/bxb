@@ -15,13 +15,14 @@ module.exports = {
     for (let i in players) {
       if (ballIds.indexOf(players[i].ballId) === -1) ballIds.push(players[i].ballId);
     }
-console.log(ballIds);
+
     for (let ballId of ballIds) {
       replacer += `
       <script src="components/balls/${ballId}/index.js"></script>
       `
     }
     content = content.replace('<bxb-script></bxb-script>', replacer)
+
     return content
   }
 }
