@@ -1,0 +1,117 @@
+@font-face {
+	font-family: "Montserrat";
+	src: local("Montserrat"), url("../fonts/Montserrat-Regular.ttf");
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: "Montserrat";
+	src: local("Montserrat"), url("../fonts/Montserrat-SemiBold.ttf");
+	font-weight: bold;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: Montserrat, Arial, serif;
+  user-select: none;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.btn {
+    width: auto;
+    min-width: 200px;
+    overflow: visible;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: normal;
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+    -webkit-appearance: none;
+    border: 1px solid #000000;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: unset;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn:hover {
+  font-weight: bold;
+}
+
+.btn-lg {
+  width: 200px !important;
+}
+
+.btn::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+.btn.full {
+  width: 100%;
+}
+
+.input {
+  border:none;
+  background-image:none;
+  background-color:transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  height: 26px;
+  border: 1px solid #000000;
+  width: auto;
+  color: inherit;
+  font: inherit;
+  padding: 10px 20px;
+  background-color: #FFFFFF;
+}
+
+.dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, .5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog .dialog-content {
+  width: 30%;
+  background-color: #FFFFFF;
+  border: 1px solid #000000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 20px;
+}
+
+.dialog .dialog-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+:root {
+  --color-red: #9B0800;
+  --color-red-light: #D60B00;
+  --color-blue: #025F62;
+  --color-blue-light: #02A3A9;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-gray: #555555;
+  --color-gray-light: #f6f6f6;
+}

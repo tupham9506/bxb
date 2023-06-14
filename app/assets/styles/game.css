@@ -1,0 +1,102 @@
+html, body, * {
+  margin: 0;
+  padding: 0;
+}
+
+#main {
+  display: flex;
+}
+
+.side {
+  background-color: var(--color-gray-light);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.skill-container {
+  width: 100%;
+  padding: 10px;
+}
+
+.untimate {
+  width: 50%;
+  border-radius: 50%;
+  border: 2px solid var(--color-white);
+  outline: 2px solid var(--color-red);
+  aspect-ratio: 1 / 1;
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.untimate-skill {
+  z-index: 100;
+  width: 75%;
+  height: 75%;
+}
+
+.untimate .skill {
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  outline: 2px solid var(--color-gray);
+  padding: 5px;
+}
+
+.untimate .skill-1 {
+  top: -30%;
+  right: 0%;
+}
+
+.untimate .skill-2 {
+  top: -15%;
+  left: -20%;
+}
+
+.untimate .skill-3 {
+  top: 70%;
+  left: -30%;
+}
+
+#bar-me .hp-bar-total {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 1;
+  background-color: var(--color-white);
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#bar-me .hp-bar-remain {
+  z-index: 1;
+  opacity: 1;
+  background-color: var(--color-red);
+  flex: 1;
+  margin-top: auto;
+}
+
+.status-text {
+  font-size: 50px;
+  text-align: center;
+  padding: 20px 0px;
+  font-weight: bold;
+}
+
+.status-text .lose-text {
+  color: var(--color-red)
+}
+
+.status-text .win-text {
+  color: var(--color-blue)
+}

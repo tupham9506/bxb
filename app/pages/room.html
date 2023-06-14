@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball x balL</title>
+  <link rel="stylesheet" href="assets/styles/common.css">
+  <link rel="stylesheet" href="assets/styles/base.css">
+  <link rel="stylesheet" href="assets/styles/room.css">
+</head>
+<body>
+  <div id="main">
+    <div class="room-list-container">
+      <div class="text-center">Danh sách các phòng<br/><br/><br/></div>
+      <div id="roomList"></div>
+      <div class="room-footer">
+        <button type="button" class="btn create-game-button" onclick="createRoom()">Tạo phòng</button>
+      </div>
+    </div>
+    <div class="user-list-container">
+      <div>Đang trực tuyến<br/><br/></div>
+      <div id="userList"></div>
+    </div>
+   
+  </div>
+  <script src="libs/socket.io/socket.io.min.js"></script>
+  <script src="assets/scripts/helper.js"></script>
+  <script src="assets/scripts/index.js"></script>
+  <bxb-script></bxb-script>
+  <script>
+    function onSetup () {
+      socket.on("connect", () => {
+        socket.on('USER_LIST', (data) => {
+          let template = ``;
+          data.forEach(item => {
+            template += `
+              <div class="user-item">
+                <div class="user-name">${item.userName}</div>
+                <div class="user-id">${item.userId}</div>
+              </div>
+            `
+          });
+          document.querySelector('#userList').innerHTML = template;
+        })
+
+        socket.on('ROOM_LIST', (data) => {
+          let template = ``;
+          data.forEach(item => {
+            if (window.userId === item.roomId) return;
+            template += `
+              <div class="room-item" onclick="joinRoom('${item.roomId}')">
+                <div class="user-name">${item.roomName}</div>
+                <div class="user-number"><img src="assets/images/character.svg"><div>${item.number} / 2</div></div>
+              </div>
+            `
+          });
+          document.querySelector('#roomList').innerHTML = template;
+        })
+
+        socket.on('JOIN_ROOM', data => {
+          $helper.setCookie('roomId', data.roomId);
+          window.location.href = '/select';
+        })
+      });
+
+      socket.on('CREATE_ROOM', (data) => {
+        $helper.setCookie('roomId', data.roomId);
+        window.location.href = '/select';
+      });
+    }
+      
+    function joinRoom (roomId) {
+      console.log(roomId);
+      socket.emit('JOIN_ROOM', { roomId })
+    }
+
+    function createRoom () {
+      socket.auth.roomId = userId;
+      socket.emit('CREATE_ROOM');
+    }
+
+  </script>
+</body>
+</html>

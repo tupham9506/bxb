@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball x balL</title>
+  <link rel="stylesheet" href="assets/styles/common.css">
+  <link rel="stylesheet" href="assets/styles/base.css">
+  <link rel="stylesheet" href="assets/styles/index.css">
+</head>
+<body>
+  <div class="flex flex-column h-100 relative">
+    <div class="header">
+      <div class="title">Ball x balL</div>
+      <img class="logo" src="assets/icons/maze-cornea.svg" alt=""/>
+    </div>
+    <div class="menu">
+      <input type="text" class="input" placeholder="Nhập tên của Khứa" id="userName">
+      <a href="#" class="btn" href="" onclick="start(); return false;">Bắt đầu</a>
+    </div>
+    <div class="version">Không bảo mật: Vì thế đừng tự hào mình là hách cơ</div>
+  </div>
+  <script src="assets/scripts/helper.js"></script>
+  <script>
+    var userId;
+    var userName;
+
+    window.onload = () => {
+      userName = $helper.getCookie('userName');
+      if (userName) {
+        document.querySelector('#userName').value = userName;
+      }
+    }
+
+    function start () {
+      userName = document.querySelector('#userName').value;
+      if (!userName) return false;
+      $helper.setCookie('userName', userName);
+      window.location.href = '/select'
+    }
+  </script>
+</body>
+</html>

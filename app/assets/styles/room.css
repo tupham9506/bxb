@@ -1,0 +1,70 @@
+#main {
+  height: inherit;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-list-container {
+  flex: 1;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#roomList {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: auto;
+}
+
+.room-item {
+  border: 1px solid var(--color-black);
+  width: 200px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.room-item .user-number {
+  display: flex;
+  flex-direction: row;
+  font-size: 16px;
+ }
+.room-item .user-number img {
+  width: 16px;
+  margin-right: 5px;
+}
+
+.user-list-container {
+  background-color: var(--color-gray-light);
+  height: 100%;
+  width: 350px;
+  padding: 10px;
+}
+
+#userList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.user-item {
+  border-bottom: 1px dashed var(--color-black);
+}
+
+.user-id {
+  color: var(--color-gray);
+  font-size: 14px;
+}
+
+.footer {
+  width: 100%;
+  display: flex;
+  padding: 20px;
+  justify-content: space-between;
+}
