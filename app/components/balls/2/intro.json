@@ -1,33 +1,33 @@
 {
   "id": 2,
-  "name": "Thắng",
-  "nickname": "Phù Thủy Nguyên Tố",
-  "range": 700,
-  "hp": 1000,
-  "speed": 5,
-  "strength": 600,
+  "name": "Phong",
+  "nickname": "Chiến Binh Cảm Tử",
+  "range": 2,
+  "hp": 7,
+  "speed": 7,
+  "strength": 7,
   "image": "components/balls/2/ball.svg",
-  "tip": "Còn gì tuyệt vời hơn khi đóng băng và cho đối thủ ăn nguyên 1 tia sét 120 triệu vôn vào mặt.",
+  "tip": "",
   "skills": [
     {
       "name": "Hỏa Cầu",
       "image": "components/balls/2/s1-icon.svg",
-      "description": "Tạo 1 quả cầu lửa thiêu đốt kẻ địch trúng phải. Gây 100 sát thương phép."
+      "description": ""
     },
     {
       "name": "Hàn Băng",
       "image": "components/balls/2/s2-icon.svg",
-      "description": "Nén toàn bộ không khí xung quanh và đóng băng mọi thứ ở cự ly gần trong vòng 1 giây."
+      "description": ""
     },
     {
       "name": "Vùng đất chết",
       "image": "components/balls/2/s3-icon.svg",
-      "description": "Ném 1 lọ thuốc độc và nổ lan ra xung quanh . Kẻ bị trúng sẽ bị nguyền rủa liên tục 10 giây, 5 máu mỗi giây"
+      "description": ""
     },
     {
-      "name": "Cơn thịnh nộ của thần thánh",
+      "name": "Một mất một còn",
       "image": "components/balls/2/s4-icon.svg",
-      "description": "Triệu hồi 1 tia sét phóng mạnh về phía đối thủ gây 500 sát thương."
+      "description": ""
     }
   ]
 }

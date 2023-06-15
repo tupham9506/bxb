@@ -4,10 +4,16 @@ module.exports = (app) => {
   
     if (!auth || !auth.userId || !auth.userName) return false
   
+    // Host of room join 
     if (auth.roomId) {
-      socket.join(auth.roomId);
-      socket.join('ROOM');
-      fetchRooms();
+      if (auth.userId === auth.roomId) {
+        socket.join(auth.roomId);
+        socket.join('ROOM');
+      } else {
+        socket.leave(auth.roomId, function (e) {
+          console.log('abc')
+        });
+      }
     }
 
     socket.join('CHANNEL');

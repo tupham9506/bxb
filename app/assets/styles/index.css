@@ -46,3 +46,14 @@ html, body {
   color: #000000;
   font-size: 14px;
 }
+
+.link a {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background: url(/assets/images/github-mark.png);
+  background-size: 100%;
+  display: inline-block;
+}

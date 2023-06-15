@@ -23,6 +23,20 @@
       <div class="header-title">VS</div>
       <div class="guide"></div>
       <div class="ball-container"></div>
+      <div class="control-guide">
+        <div class="control-guide-line">
+          <div><div class="control-button">A</div> Trái</div>
+          <div><div class="control-button">D</div> Phải</div>
+          <div><div class="control-button">W</div> Tiến</div>
+          <div><div class="control-button">S</div> Lùi</div>
+        </div>
+        <div class="control-guide-line">
+          <div><div class="control-button">J</div> Skill 1</div>
+          <div><div class="control-button">K</div> Skill 2</div>
+          <div><div class="control-button">L</div> Skill 3</div>
+          <div><div class="control-button">O</div> Skill cuối</div>
+        </div>
+      </div>
     </div>
     <div id="player2">
       <div class="header">
@@ -55,18 +69,19 @@
 
       if (window.userId === window.roomId) {
         document.querySelector('#player1 .ready-button').innerHTML = 'Bắt đầu';
-        document.querySelector('.guide').innerHTML = '* Lựa chọn nhân vật bóng, chờ đối thủ sẵn sàng và ấn nút bắt đầu trận đấu.'
-        document.querySelector('.ready-status').innerHTML = 'Chưa sẵn sàng';
+        document.querySelector('.guide').innerHTML = '* Lựa chọn nhân vật bóng, chờ đối thủ sẵn sàng và ấn nút "Bắt đầu" trận đấu.'
+        document.querySelector('.ready-status').innerHTML = '<div class="ready-false">Chưa sẵn sàng</div>';
       } else {
-        document.querySelector('.guide').innerHTML = '* Lựa chọn nhân vật bóng sau đó bấm vào nút sẵn sàng. Chờ đợi chủ phòng bắt đầu trận đấu.';
+        document.querySelector('.guide').innerHTML = '* Lựa chọn nhân vật bóng sau đó bấm vào nút "Sẵn sàng". Chờ đợi chủ phòng bắt đầu trận đấu.';
       }
 
       socket.on("connect", () => {
         socket.on('ROOM_DETAIL', (data) => {
-          console.log(data)
           let template = ``;
           data.forEach(item => {
-            if (!players[item.userId]) players[item.userId] = {}
+            if (!players[item.userId]) players[item.userId] = {
+              userName: item.userName
+            }
 
             if (window.userId === item.userId) {
               document.querySelector('#player1 .user-name').innerHTML = userName;
@@ -81,12 +96,11 @@
       socket.on('READY', () => {
         isPlayerReady = true;
         if (window.userId === window.roomId) {
-          document.querySelector('.ready-status').innerHTML = 'Đã sẵn sàng';
+          document.querySelector('.ready-status').innerHTML = '<div class="ready-true">Đã sẵn sàng</div>';
         }
       });
 
       socket.on('SELECT_BALL', (data) => {
-        console.log('select')
         buildSelectBall(data.userId, data.ballId)
       });
     
@@ -102,14 +116,13 @@
       }
       self.classList.add('active-1');
       socket.emit('SELECT_BALL', {
-        userId: userId,
+        userId: window.userId,
         ballId: id,
         roomId: roomId
       });
     }
 
     function buildSelectBall (userId, ballId) {
-      console.log(userId, ballId);
       const ball = window.BALLS[ballId];
       let skillTemplate = '';
       for(let skill of ball.skills) {
@@ -120,7 +133,10 @@
 
       let template =  `
         <div class="selected-ball">
-          <div class="ball-name">${ball.name} - ${ball.nickname}</div>
+          <div class="ball-name">
+            <div>${ball.name}</div>
+            <div class="ball-nickname">${ball.nickname}</div>
+          </div>
           <div class="ball-image"><img src="${ball.image}"></div>
           <table class="skill-table">
             <tr>
@@ -167,14 +183,7 @@
     }
 
     function getIndexPercent (type, value) {
-      const index = {
-        hp: 2000,
-        speed: 10,
-        strength: 1000,
-        range: 1000
-      }
-
-      return value * 100 / index[type];
+      return value * 100 / 10;
     }
 
     function startGame () {
@@ -183,9 +192,10 @@
         for (let i in window.players) {
           if (!window.players[i].ballId) return false;
         }
-        socket.emit('START_GAME');
+        return socket.emit('START_GAME');
       }
-
+      if (!window.players[userId].ballId) return false;
+      document.querySelector('.ready-button').innerHTML = "Đã sẵn sàng";
       socket.emit('READY');
     }
   </script>

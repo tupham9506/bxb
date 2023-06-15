@@ -122,7 +122,8 @@ function Ball1 (config = {}) {
       self.text = null;
     }
     self.text = new PIXI.Text(data.title, style);
-    self.text.x = self.container.width
+    self.text.y = -self.ball.height/2;
+    self.text.x = self.ball.width/2
     self.container.addChild(self.text);
     setTimeout(() => {
       self.container.removeChild(self.text);
@@ -153,7 +154,11 @@ function Ball1 (config = {}) {
   self.buildHp = () => {
     const hpSelector = document.querySelector(`[user-id="${config.userId}"] .hp-bar-remain`);
     if (hpSelector) {
-      hpSelector.style.height = (self.hp / self.hpTotal) * 100 + '%';
+      const size = config.isMe ? 'height' : 'width'
+      hpSelector.style[size] = (self.hp / self.hpTotal) * 100 + '%';
+      if (!config.isMe) {
+        hpSelector.innerHTML = self.hp;
+      }
     }
   }
 
@@ -423,6 +428,7 @@ function Ball1 (config = {}) {
       })
       s4.isEnabled = false;
     }
+    document.querySelector('.untimate-skill').innerHTML = '';
     
     const currenDirect = [...self.direct];
     const anchor = $helper.anchor(self.container, self.ball, currenDirect, s4.src)
@@ -430,7 +436,7 @@ function Ball1 (config = {}) {
     s4.src.y = anchor.y;
     s4.src.angle = $helper.angleByDirect(currenDirect);
     $pixi.stage.addChild(s4.src);
-    $pixi.renderer.backgroundColor = '#000000';
+    $pixi.renderer.backgroundColor = '#3f3f3f';
     let count = 0;
     var isHit = false;
 

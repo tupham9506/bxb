@@ -19,7 +19,10 @@
       <input type="text" class="input" placeholder="Nhập tên của Khứa" id="userName">
       <a href="#" class="btn" href="" onclick="start(); return false;">Bắt đầu</a>
     </div>
-    <div class="version">Không bảo mật: Vì thế đừng tự hào mình là hách cơ</div>
+    <div class="version">Phiên bản lỗi đến từ Chú Bò Trầm Cảm</div>
+    <div class="link">
+      <a href="https://github.com/tupham9506/bxb" class="github"></a>
+    </div>
   </div>
   <script src="assets/scripts/helper.js"></script>
   <script>
@@ -37,7 +40,7 @@
       userName = document.querySelector('#userName').value;
       if (!userName) return false;
       $helper.setCookie('userName', userName);
-      window.location.href = '/select'
+      window.location.href = '/room'
     }
   </script>
 </body>

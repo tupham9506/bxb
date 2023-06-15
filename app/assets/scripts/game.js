@@ -65,6 +65,7 @@ function onSetup() {
       document.querySelector('#bar-me').setAttribute('user-id', i);
     } else {
       document.querySelector('#bar-other').setAttribute('user-id', i);
+      document.querySelector('.side .user-name').innerHTML = $players[i].userName;
     }
 
     $players[i].ball = new window[`Ball${$players[i].ballId}`]({
@@ -124,6 +125,12 @@ function onSetup() {
       return $players[userId].ball.ctrl.s4();
     }
   });
+  
+  // window.onbeforeunload = function() {  
+  //   $helper.setCookie('roomId', '');
+  //   $helper.setCookie('players', '');
+  //   return "";
+  // }
 }
 
 function $command (data) {

@@ -3,8 +3,8 @@ function Ball2 (config = {}) {
   const self = this;
   
   // Ball info
-  self.hp = 1500;
-  self.hpTotal = 1500;
+  self.hp = 1200;
+  self.hpTotal = 1200;
   self.speed = $point;
   self.direct = config.direct;
   self.isLockMove = false;
@@ -138,7 +138,8 @@ function Ball2 (config = {}) {
       self.text = null;
     }
     self.text = new PIXI.Text(data.title, style);
-    self.text.x = self.container.width
+    self.text.y = -self.ball.height/2;
+    self.text.x = self.ball.width/2
     self.container.addChild(self.text);
     setTimeout(() => {
       self.container.removeChild(self.text);
@@ -147,9 +148,16 @@ function Ball2 (config = {}) {
   }
 
   self.command.hp = (data) => {
-    self.hp += data.hp;
+    var hp = data.hp;
+    
+    // Reduce damage
+    console.log(s2.isRun);
+    if (hp < 0 && s2.isRun) {
+      hp = hp - Math.round(hp * s2.defPercent / 100)
+    }
+    self.hp += hp;
     self.command.text({
-      title: data.hp,
+      title: hp,
       style: {
         fill: '0xFF0000',
         fontSize: data.isCrit ? $4_point : $2_point
@@ -176,7 +184,11 @@ function Ball2 (config = {}) {
   self.buildHp = () => {
     const hpSelector = document.querySelector(`[user-id="${config.userId}"] .hp-bar-remain`);
     if (hpSelector) {
-      hpSelector.style.height = (self.hp / self.hpTotal) * 100 + '%';
+      const size = config.isMe ? 'height' : 'width'
+      hpSelector.style[size] = (self.hp / self.hpTotal) * 100 + '%';
+      if (!config.isMe) {
+        hpSelector.innerHTML = self.hp;
+      }
     }
   }
 
@@ -266,7 +278,8 @@ function Ball2 (config = {}) {
   const s2 = {
     isEnabled: true,
     defPercent: 80,
-    time: 2000
+    time: 2000,
+    isRun: false
   }
 
   self.ctrl.s2 = () => {
@@ -280,6 +293,7 @@ function Ball2 (config = {}) {
       })
       self.isLockMove = true;
     }
+    s2.isRun = true;
     s2.isEnabled = false;
 
     self.ball.texture = ballS2Texture;
@@ -287,6 +301,7 @@ function Ball2 (config = {}) {
       self.ball.texture = ballTexture;
       self.isLockMove = false;
       s2.isEnabled = true;
+      s2.isRun = false;
     }, s2.time);
  
   };
@@ -331,6 +346,7 @@ function Ball2 (config = {}) {
       s4.isEnabled = false;
       s2.isEnabled = false;
     }
+    document.querySelector('.untimate-skill').innerHTML = '';
     s4.isRun = true;
     const weaponWidthOrg = self.weapon.width;
     const weaponheightOrg = self.weapon.height;
