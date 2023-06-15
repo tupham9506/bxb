@@ -128,7 +128,15 @@ function Ball2 (config = {}) {
     self.container.x = data.x * $point;
     self.container.y = data.y * $point;
     self.direct = data.direct;
+    self.buildWeaponPosition();
   }
+
+  self.command.lockMove = (data) => {
+    self.isLockMove = true;
+    setTimeout(() => {
+      self.isLockMove = false
+    }, data.effectTime)
+  };
 
   self.command.text = (data) => {
     const style = data.style || {};
@@ -151,13 +159,13 @@ function Ball2 (config = {}) {
     var hp = data.hp;
     
     // Reduce damage
-    console.log(s2.isRun);
     if (hp < 0 && s2.isRun) {
       hp = hp - Math.round(hp * s2.defPercent / 100)
     }
     self.hp += hp;
     self.command.text({
-      title: hp,
+      title: data.title || hp,
+      time: data.time,
       style: {
         fill: '0xFF0000',
         fontSize: data.isCrit ? $4_point : $2_point

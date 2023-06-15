@@ -51,7 +51,7 @@
             template += `
               <div class="room-item" onclick="joinRoom('${item.roomId}')">
                 <div class="user-name">${item.roomName}</div>
-                <div class="user-number"><img src="assets/images/character.svg"><div>${item.number} / 2</div></div>
+                <div class="user-number"><img src="assets/images/character.svg"><div>${item.players?.length || 0} / 2</div></div>
               </div>
             `
           });

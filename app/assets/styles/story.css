@@ -1,0 +1,23 @@
+.storyPage {
+  margin: 20px auto;
+  width: 70%;
+  padding: 20px;
+}
+.storyContainer {
+  border: 1px solid #000000;
+  padding: 20px;
+  margin-bottom: 10px;
+  user-select: text !important;
+}
+
+.storyTitle {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+.storyContent {
+  font-size: 18px;
+  text-align: justify;
+  text-indent: 20px;
+}
+

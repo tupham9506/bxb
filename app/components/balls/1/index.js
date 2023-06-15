@@ -114,6 +114,13 @@ function Ball1 (config = {}) {
     self.direct = data.direct;
   }
 
+  self.command.lockMove = (data) => {
+    self.isLockMove = true;
+    setTimeout(() => {
+      self.isLockMove = false
+    }, data.effectTime)
+  };
+
   self.command.text = (data) => {
     const style = data.style || {};
     const time = data.time || 1000;
@@ -205,7 +212,6 @@ function Ball1 (config = {}) {
     var isHit = false;
 
     requestAnimationFrame(function start () {
-      
       if (!isHit) {
         for (let i in $players) {
           if (i == config.userId) continue;
@@ -246,7 +252,8 @@ function Ball1 (config = {}) {
     isEnabled: true,
     atk: 50,
     speed: $1_point,
-    range: $100_point
+    range: $100_point,
+    effectTime: 2000
   }
 
   s2.src.width = $10_point;
@@ -283,9 +290,16 @@ function Ball1 (config = {}) {
 
           if (config.isMe && isHit) {
             $command({
+              name: 'lockMove',
+              effectTime: s2.effectTime,
+              userId: i,
+            });
+            $command({
               name: 'hp',
               hp: -s2.atk,
               userId: i,
+              title: 'Bị Đóng Băng',
+              time: s2.effectTime, 
             });
             break;
           };
@@ -409,7 +423,7 @@ function Ball1 (config = {}) {
   const s4 = {
     src: PIXI.Sprite.from(namespace + 's4.svg'),
     isEnabled: true,
-    atk: 500,
+    atk: 400,
     speed: $2_point
   }
 

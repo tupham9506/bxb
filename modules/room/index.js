@@ -1,18 +1,21 @@
-module.exports = (app) => {
+const Room = require('./../../models/rooms')
+const  { v4: uuidv4 } = require('uuid');
+
+module.exports = async app => {
   io.on('connection', async socket => {
     const auth = socket.handshake.auth;
   
     if (!auth || !auth.userId || !auth.userName) return false
-  
-    // Host of room join 
+
     if (auth.roomId) {
-      if (auth.userId === auth.roomId) {
+      const room = await Room.findOne({
+        roomId: auth.roomId,
+        status: 1
+      });
+
+      if (room) {
         socket.join(auth.roomId);
         socket.join('ROOM');
-      } else {
-        socket.leave(auth.roomId, function (e) {
-          console.log('abc')
-        });
       }
     }
 
@@ -20,9 +23,17 @@ module.exports = (app) => {
     fetchUsers();
     fetchRooms();
 
-    socket.on('CREATE_ROOM', () => {
-      const roomId = auth.userId;
-      socket.join(roomId);
+    socket.on('CREATE_ROOM', async () => {
+      
+      const room = await Room.create({
+        keyUserId: auth.userId,
+        roomName: auth.userName,
+        players:[{
+          userId: auth.userId
+        }]
+      })
+
+      socket.join(room.id);
       socket.join('ROOM');
       socket.emit('CREATE_ROOM', { roomId });
       fetchRooms();
@@ -47,17 +58,9 @@ module.exports = (app) => {
 }
 
 async function fetchRooms () {
-  var rooms = [];
-  const clients = await io.sockets.in('ROOM').fetchSockets();
-  for (let client of clients) {
-    const userRoomClients = await io.sockets.in(client.handshake.auth.userId).fetchSockets();
-    if (!userRoomClients.length) continue;
-    rooms.push({
-      roomId: client.handshake.auth.userId,
-      roomName: client.handshake.auth.userName,
-      number: userRoomClients.length
-    })
-  }
+  var rooms = await Room.find({
+    status: 1
+  });
 
   io.in('CHANNEL').emit('ROOM_LIST', rooms)
 }

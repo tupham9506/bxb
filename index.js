@@ -3,28 +3,35 @@ const app = express()
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+const bodyParser = require('body-parser')
+
 global.io = new Server(server);
-const  { v4: uuidv4 } = require('uuid');
-var path = require("path");
 
 app.use(require('cookie-parser')());
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 require('dotenv').config()
 
 app.use(express.static('app'));
 
-app.get('/', function (req, res) {
-  if (!req.cookies.userId) {
-    res.cookie('userId', uuidv4())
-  }
-  res.sendFile(path.join(__dirname+ '/app/pages/index.html'));
-});
 app.use(express.static(__dirname + '/app/pages',{ extensions:['html'] }));
 
-// Fetch modules
-require('./modules/room')(app);
-require('./modules/select')(app);
-require('./modules/game')(app);
+const init = async () => {
+  await require('./config/database')();
+  // Fetch modules
+  require('./modules/home')(app);
+  require('./modules/story')(app);
+  require('./modules/room')(app);
+  require('./modules/select')(app);
+  require('./modules/game')(app);
+}
+
+init();
+
 
 server.listen(process.env.PORT);
 

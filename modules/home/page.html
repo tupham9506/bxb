@@ -18,10 +18,11 @@
     <div class="menu">
       <input type="text" class="input" placeholder="Nhập tên của Khứa" id="userName">
       <a href="#" class="btn" href="" onclick="start(); return false;">Bắt đầu</a>
+      <a href="/story" class="btn">Story</a>
     </div>
-    <div class="version">Phiên bản lỗi đến từ Chú Bò Trầm Cảm</div>
+    <div class="version">Phiên bản thử nghiệm đến từ Chú Bò Trầm Cảm</div>
     <div class="link">
-      <a href="https://github.com/tupham9506/bxb" class="github"></a>
+      <a href="https://github.com/tupham9506/bxb" target="_blank" class="github"></a>
     </div>
   </div>
   <script src="assets/scripts/helper.js"></script>
@@ -29,17 +30,25 @@
     var userId;
     var userName;
 
-    window.onload = () => {
-      userName = $helper.getCookie('userName');
-      if (userName) {
-        document.querySelector('#userName').value = userName;
+    window.onload = async () => {
+      userId = $helper.getCookie('userId');
+
+      if (userId) {
+        const res = await (await fetch('/api/user')).json();
+        if (res.data) {
+          document.querySelector('#userName').value = res.data.userName;
+        }
       }
     }
 
-    function start () {
-      userName = document.querySelector('#userName').value;
-      if (!userName) return false;
-      $helper.setCookie('userName', userName);
+    async function start () {
+      const res = await (await fetch('/api/start', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          userName: document.querySelector('#userName').value
+        })
+      })).json();
       window.location.href = '/room'
     }
   </script>
