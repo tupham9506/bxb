@@ -16,7 +16,7 @@ function onSetup() {
     if (window.isGameOver) return false;
 
     if (data.name === 'gameOver') {
-      const statusText = data.userId === window.userId ? '<div class="lose-text">You lose!</div>' : '<div class="win-text">You win</div>';
+      const statusText = data.id === window.id ? '<div class="lose-text">You lose!</div>' : '<div class="win-text">You win</div>';
       $helper.setCookie('players', '');
       document.querySelector('#dialog').innerHTML = `
         <div class="dialog">
@@ -30,7 +30,7 @@ function onSetup() {
       window.isGameOver = true;
       return false;
     }
-    $players[data.userId].ball.command[data.name](data);
+    $players[data.id].ball.command[data.name](data);
   });
  
   $pixi = new PIXI.Application({ 
@@ -60,7 +60,7 @@ function onSetup() {
   $100_point = 100 * $point;
 
   for (let i in $players) {
-    const isMe = window.userId === i;
+    const isMe = window.id === i;
     if (isMe) {
       document.querySelector('#bar-me').setAttribute('user-id', i);
     } else {
@@ -69,7 +69,7 @@ function onSetup() {
     }
 
     $players[i].ball = new window[`Ball${$players[i].ballId}`]({
-      userId: i,
+      id: i,
       isMe: isMe, 
       x: window.roomId === i ? $10_point : $pixi.screen.width - $10_point,
       y: 100*$point/2,
@@ -79,25 +79,25 @@ function onSetup() {
 
   document.addEventListener("keydown", function(event) {
     if (event.which == 68) {
-      $players[userId].ball.ctrl.move({
+      $players[id].ball.ctrl.move({
         key: 'right'
       });
     }
 
     if (event.which == 87) {
-      $players[userId].ball.ctrl.move({
+      $players[id].ball.ctrl.move({
         key: 'up'
       });
     }
 
     if (event.which == 65) {
-      $players[userId].ball.ctrl.move({
+      $players[id].ball.ctrl.move({
         key: 'left'
       });
     }
 
     if (event.which == 83) {
-      $players[userId].ball.ctrl.move({
+      $players[id].ball.ctrl.move({
         key: 'down'
       });
     }
@@ -105,7 +105,7 @@ function onSetup() {
 
   document.addEventListener("keyup", function(event) {
     if ([68, 65, 87, 83].indexOf(event.which) > -1) {
-      $players[userId].ball.ctrl.move({
+      $players[id].ball.ctrl.move({
         key: 'stop'
       });
     }
@@ -113,16 +113,16 @@ function onSetup() {
 
   document.addEventListener("keypress", function(event) {
     if (event.which == 106) {
-      return $players[userId].ball.ctrl.s1();
+      return $players[id].ball.ctrl.s1();
     }
     if (event.keyCode === 107) {
-      return $players[userId].ball.ctrl.s2();
+      return $players[id].ball.ctrl.s2();
     }
     if (event.keyCode === 108) {
-      return $players[userId].ball.ctrl.s3();
+      return $players[id].ball.ctrl.s3();
     }
     if (event.keyCode === 111) {
-      return $players[userId].ball.ctrl.s4();
+      return $players[id].ball.ctrl.s4();
     }
   });
   

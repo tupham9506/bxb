@@ -27,13 +27,13 @@
   </div>
   <script src="assets/scripts/helper.js"></script>
   <script>
-    var userId;
+    var id;
     var userName;
 
     window.onload = async () => {
-      userId = $helper.getCookie('userId');
+      id = $helper.getCookie('id');
 
-      if (userId) {
+      if (id) {
         const res = await (await fetch('/api/user')).json();
         if (res.data) {
           document.querySelector('#userName').value = res.data.userName;

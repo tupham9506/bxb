@@ -1,78 +1,90 @@
-const Room = require('./../../models/rooms')
-const  { v4: uuidv4 } = require('uuid');
+var path = require('path')
+const Room = require('./../../models/room')
+const User = require('./../../models/user')
 
 module.exports = async app => {
-  io.on('connection', async socket => {
-    const auth = socket.handshake.auth;
-  
-    if (!auth || !auth.userId || !auth.userName) return false
+  app.get('/room', function (_req, res) {
+    res.sendFile(path.join(__dirname + '/room.html'))
+  })
 
-    if (auth.roomId) {
-      const room = await Room.findOne({
-        roomId: auth.roomId,
-        status: 1
-      });
-
-      if (room) {
-        socket.join(auth.roomId);
-        socket.join('ROOM');
-      }
+  global.io.on('connection', async socket => {
+    socket.join('CHANNEL')
+    if (socket.auth.roomId) {
+      socket.join(socket.auth.roomId)
+      socket.join('ROOM')
     }
 
-    socket.join('CHANNEL');
-    fetchUsers();
-    fetchRooms();
+    fetchUsers()
+    fetchRooms()
 
     socket.on('CREATE_ROOM', async () => {
-      
+      const players = {}
+
+      players[socket.auth.id] = {
+        id: socket.auth.id,
+        userName: socket.auth.userName
+      }
+
       const room = await Room.create({
-        keyUserId: auth.userId,
-        roomName: auth.userName,
-        players:[{
-          userId: auth.userId
-        }]
+        id: socket.auth.id,
+        roomName: socket.auth.userName,
+        players
       })
 
-      socket.join(room.id);
-      socket.join('ROOM');
-      socket.emit('CREATE_ROOM', { roomId });
-      fetchRooms();
+      room.id = room._id
+      await room.save()
+
+      await User.updateOne({ _id: socket.auth._id }, { roomId: room.id })
+      socket.emit('CREATE_ROOM')
+      fetchRooms()
     })
 
     socket.on('JOIN_ROOM', async data => {
-      let clients = await io.sockets.in(data.roomId).fetchSockets();
-      if (clients.length === 1) {
-        socket.join(data.roomId);
-        io.sockets.in(data.roomId).emit('JOIN_ROOM', {
-          roomId: data.roomId
-        });
-        fetchRooms();
+      const room = await Room.findOne({ _id: data.id })
+      if (!room || Object.keys(room.players).length >= 2) return false
+      room.players[socket.auth.id] = {
+        id: socket.auth.id,
+        userName: socket.auth.userName
       }
-    });
-  
-    socket.on('disconnect', function () {
-      fetchRooms();
-      fetchUsers();
-    });
-  });
-}
 
-async function fetchRooms () {
-  var rooms = await Room.find({
-    status: 1
-  });
+      await Room.updateOne({ _id: data.id }, { players: room.players })
 
-  io.in('CHANNEL').emit('ROOM_LIST', rooms)
-}
-
-async function fetchUsers () {
-  var users = [];
-  const clients = await io.sockets.in('CHANNEL').fetchSockets();
-  for (let client of clients) {
-    users.push({
-      userId: client.handshake.auth.userId,
-      userName: client.handshake.auth.userName,
+      await User.updateOne({ _id: socket.auth._id }, { roomId: room.id })
+      socket.emit('JOIN_ROOM')
+      fetchRooms()
     })
+
+    socket.on('disconnect', function () {
+      fetchRooms()
+      fetchUsers()
+    })
+  })
+}
+
+async function fetchRooms() {
+  const rooms = []
+  var dbRooms = await Room.find({
+    status: 1
+  })
+
+  for (let dbRoom of dbRooms) {
+    let clients = await global.io.sockets.in(dbRoom.id).fetchSockets()
+
+    if (clients.length) {
+      rooms.push(dbRoom)
+    }
   }
-  io.in('CHANNEL').emit('USER_LIST', users)
+
+  global.io.in('CHANNEL').emit('ROOM_LIST', rooms)
+}
+
+async function fetchUsers() {
+  const clients = await global.io.sockets.in('CHANNEL').fetchSockets()
+  const users = await User.find({
+    _id: {
+      $in: clients.map(client => client.handshake.auth.id)
+    }
+  })
+
+  global.io.in('CHANNEL').emit('USER_LIST', users)
 }

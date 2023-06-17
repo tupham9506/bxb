@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball x balL</title>
+  <link rel="stylesheet" href="assets/styles/common.css">
+  <link rel="stylesheet" href="assets/styles/base.css">
+  <link rel="stylesheet" href="assets/styles/room.css">
+</head>
+<body>
+  <div id="main">
+    <div class="room-list-container">
+      <div class="text-center">Danh sách phòng chờ<br/><br/><br/></div>
+      <div id="roomList"></div>
+      <div class="room-footer">
+        <button type="button" class="btn create-game-button" onclick="createRoom()">Tạo phòng</button>
+      </div>
+    </div>
+    <div class="user-list-container">
+      <div>Đang trực tuyến<br/><br/></div>
+      <div id="userList"></div>
+    </div>
+   
+  </div>
+  <script src="libs/socket.io/socket.io.min.js"></script>
+  <script src="assets/scripts/helper.js"></script>
+  <script src="assets/scripts/room.js"></script>
+  <script src="assets/scripts/index.js"></script>
+  <bxb-script></bxb-script>
+</body>
+</html>

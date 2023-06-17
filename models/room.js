@@ -1,12 +1,12 @@
-const { defineSchema } = require("./baseSchema");
+const { defineSchema } = require('./baseSchema')
 
 module.exports = global.database.model(
-  "rooms",
+  'rooms',
   defineSchema({
-    roomId: String,
-    keyUserId: String,
+    id: String,
+    userId: String,
     roomName: String,
-    players: Array,
+    players: Object,
     status: {
       type: String,
       default: 1
