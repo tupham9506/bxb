@@ -18,26 +18,34 @@ module.exports = app => {
       global.io.in(room.id).emit('ROOM_DETAIL', room)
     })
 
-    socket.on('READY', async () => {
-      
+    socket.on('START_GAME', async () => {
       const room = await Room.findOne({ _id: socket.auth.roomId })
-      room.players[socket.auth.id][] = data.ballId
-      await Room.updateOne({ _id: room._id }, { players: room.players })
-      global.io.sockets.in(socket.auth.roomId).emit('READY')
+      if (!room.players[socket.auth.id].ballId) return false
+      room.players[socket.auth.id].status = 1 // Ready
+      let isAllReady = true
+      for (let i in room.players) {
+        if (room.players[i].status !== 1) {
+          isAllReady = false
+          break
+        }
+      }
+      if (Object.keys(room.players).length && isAllReady) {
+        room.status = 2 // Start game
+      }
+      await Room.updateOne({ _id: room._id }, { status: room.status, players: room.players })
+      await fetchRoom(socket.auth.roomId)
     })
 
-    socket.on('START_GAME', () => {
-      global.io.sockets.in(socket.auth.roomId).emit('START_GAME')
-    })
-
-    fetchRoom(socket.auth.roomId)
+    await fetchRoom(socket.auth.roomId)
   })
 }
 
 async function fetchRoom(roomId) {
   const room = await Room.findOne({
     _id: roomId,
-    status: 1
+    status: {
+      $in: [1, 2]
+    }
   })
 
   global.io.in(roomId).emit('ROOM_DETAIL', room)

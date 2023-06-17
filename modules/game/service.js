@@ -1,19 +1,22 @@
-const fs = require('fs');
+const fs = require('fs')
+const User = require('../../models/user')
+const Room = require('../../models/room')
 
 module.exports = {
-  index: (req) => {
-    var players = {};
-    try {
-      players = JSON.parse(req.cookies.players);
-    } catch (e) {
-      players = {};
-    }
-    
-    let content = fs.readFileSync(__dirname + '/game.html', {encoding: 'utf-8'});
-    let replacer = '';
-    const ballIds = [];
-    for (let i in players) {
-      if (ballIds.indexOf(players[i].ballId) === -1) ballIds.push(players[i].ballId);
+  index: async req => {
+    let content = fs.readFileSync(__dirname + '/game.html', { encoding: 'utf-8' })
+
+    const user = await User.findOne({ _id: req.cookies.id })
+
+    if (!user || !user.roomId) return content
+
+    const room = await Room.findOne({ _id: user.roomId })
+
+    let replacer = ''
+    const ballIds = []
+
+    for (let i in room.players) {
+      if (ballIds.indexOf(room.players[i].ballId) === -1) ballIds.push(room.players[i].ballId)
     }
 
     for (let ballId of ballIds) {

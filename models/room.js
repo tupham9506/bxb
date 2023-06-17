@@ -8,7 +8,7 @@ module.exports = global.database.model(
     roomName: String,
     players: Object,
     status: {
-      type: String,
+      type: Number,
       default: 1
     }
   })

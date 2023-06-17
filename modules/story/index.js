@@ -1,7 +1,7 @@
-const services = require('./service');
+const services = require('./service')
 
-module.exports = (app) => {
+module.exports = app => {
   app.get('/story', function (req, res) {
-    return res.send(services.page());
-  });
+    return res.send(services.page())
+  })
 }

@@ -22,12 +22,14 @@ module.exports = async app => {
 
       players[socket.auth.id] = {
         id: socket.auth.id,
-        userName: socket.auth.userName
+        userName: socket.auth.userName,
+        isKey: 1
       }
 
       const room = await Room.create({
         id: socket.auth.id,
         roomName: socket.auth.userName,
+        userId: socket.auth.id,
         players
       })
 

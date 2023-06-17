@@ -22,7 +22,7 @@ bxb canvas {
   width: 100%;
 }
 
-.untimate {
+.ultimate {
   width: 50%;
   border-radius: 50%;
   border: 2px solid var(--color-white);
@@ -35,13 +35,13 @@ bxb canvas {
   position: relative;
 }
 
-.untimate-skill {
+.ultimate-skill {
   z-index: 100;
   width: 75%;
   height: 75%;
 }
 
-.untimate .skill {
+.ultimate .skill {
   position: absolute;
   width: 30%;
   height: 30%;
@@ -50,17 +50,17 @@ bxb canvas {
   padding: 5px;
 }
 
-.untimate .skill-1 {
+.ultimate .skill-1 {
   top: -30%;
   right: 0%;
 }
 
-.untimate .skill-2 {
+.ultimate .skill-2 {
   top: -15%;
   left: -20%;
 }
 
-.untimate .skill-3 {
+.ultimate .skill-3 {
   top: 70%;
   left: -30%;
 }

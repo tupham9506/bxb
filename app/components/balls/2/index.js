@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 function Ball2(config = {}) {
   const namespace = 'components/balls/2/'
   const self = this
@@ -5,7 +6,7 @@ function Ball2(config = {}) {
   // Ball info
   self.hp = 1200
   self.hpTotal = 1200
-  self.speed = $point
+  self.speed = window.$point
   self.direct = config.direct
   self.isLockMove = false
   self.isLockSkill = false
@@ -14,58 +15,58 @@ function Ball2(config = {}) {
   self.isAtk = false
 
   // Ball container
-  self.container = new PIXI.Container()
-  $pixi.stage.addChild(self.container)
+  self.container = new window.PIXI.Container()
+  window.$pixi.stage.addChild(self.container)
   self.container.x = config.x || 0
   self.container.y = config.y || 0
 
-  const ballTexture = PIXI.Texture.from(namespace + 'ball.svg')
-  const ballS2Texture = PIXI.Texture.from(namespace + 'ball-s2.svg')
-  const ballS4Texture = PIXI.Texture.from(namespace + 'ball-s4.svg')
+  const ballTexture = window.PIXI.Texture.from(namespace + 'ball.svg')
+  const ballS2Texture = window.PIXI.Texture.from(namespace + 'ball-s2.svg')
+  const ballS4Texture = window.PIXI.Texture.from(namespace + 'ball-s4.svg')
 
-  self.ball = new PIXI.Sprite(ballTexture)
-  self.ball.width = $10_point
-  self.ball.height = $10_point
+  self.ball = new window.PIXI.Sprite(ballTexture)
+  self.ball.width = window.$10_point
+  self.ball.height = window.$10_point
   self.ball.anchor.set(0.5)
 
-  const weaponTexture = PIXI.Texture.from(namespace + 'weapon.svg')
-  const weaponS4Texture = PIXI.Texture.from(namespace + 'weapon-s4.svg')
-  self.weapon = new PIXI.Sprite(weaponTexture)
-  self.weapon.width = $5_point
-  self.weapon.height = $15_point
+  const weaponTexture = window.PIXI.Texture.from(namespace + 'weapon.svg')
+  const weaponS4Texture = window.PIXI.Texture.from(namespace + 'weapon-s4.svg')
+  self.weapon = new window.PIXI.Sprite(weaponTexture)
+  self.weapon.width = window.$5_point
+  self.weapon.height = window.$15_point
   self.weapon.x = +self.ball.width / 2
   self.weapon.anchor.set(0.5, 0)
 
   self.container.addChild(self.ball)
   self.container.addChild(self.weapon)
   self.text = null
-  var currentMove = null
-  var currentMoveId = null
+  let currentMove = null
+  let currentMoveId = null
 
-  // Controll define
+  // Control define
   self.ctrl.left = () => {
     if (self.container.x <= 0) return
     self.container.x -= self.speed
     self.direct = ['x', -1]
-    $command({
+    window.$command({
       id: config.id,
       name: 'position',
-      x: self.container.x / $point,
-      y: self.container.y / $point,
+      x: self.container.x / window.$point,
+      y: self.container.y / window.$point,
       direct: self.direct
     })
     currentMoveId = requestAnimationFrame(self.ctrl.left)
   }
 
   self.ctrl.right = () => {
-    if (self.container.x + self.ball.width >= $pixi.screen.width) return
+    if (self.container.x + self.ball.width >= window.$pixi.screen.width) return
     self.container.x += self.speed
     self.direct = ['x', +1]
-    $command({
+    window.$command({
       id: config.id,
       name: 'position',
-      x: self.container.x / $point,
-      y: self.container.y / $point,
+      x: self.container.x / window.$point,
+      y: self.container.y / window.$point,
       direct: self.direct
     })
     currentMoveId = requestAnimationFrame(self.ctrl.right)
@@ -75,25 +76,25 @@ function Ball2(config = {}) {
     if (self.container.y <= 0) return
     self.container.y -= self.speed
     self.direct = ['y', -1]
-    $command({
+    window.$command({
       id: config.id,
       name: 'position',
-      x: self.container.x / $point,
-      y: self.container.y / $point,
+      x: self.container.x / window.$point,
+      y: self.container.y / window.$point,
       direct: self.direct
     })
     currentMoveId = requestAnimationFrame(self.ctrl.up)
   }
 
   self.ctrl.down = () => {
-    if (self.container.y + self.ball.height >= $pixi.screen.height) return
+    if (self.container.y + self.ball.height >= window.$pixi.screen.height) return
     self.container.y += self.speed
     self.direct = ['y', +1]
-    $command({
+    window.$command({
       id: config.id,
       name: 'position',
-      x: self.container.x / $point,
-      y: self.container.y / $point,
+      x: self.container.x / window.$point,
+      y: self.container.y / window.$point,
       direct: self.direct
     })
     currentMoveId = requestAnimationFrame(self.ctrl.down)
@@ -109,7 +110,7 @@ function Ball2(config = {}) {
     if (!self.isAtk) {
       self.buildWeaponPosition()
     }
-    if (currentMove && data.key != currentMove) {
+    if (currentMove && data.key !== currentMove) {
       cancelAnimationFrame(currentMoveId)
     }
     if (data.key === 'stop') {
@@ -125,8 +126,8 @@ function Ball2(config = {}) {
 
   self.command.position = data => {
     if (config.isMe) return false
-    self.container.x = data.x * $point
-    self.container.y = data.y * $point
+    self.container.x = data.x * window.$point
+    self.container.y = data.y * window.$point
     self.direct = data.direct
     self.buildWeaponPosition()
   }
@@ -145,7 +146,7 @@ function Ball2(config = {}) {
       self.container.removeChild(self.text)
       self.text = null
     }
-    self.text = new PIXI.Text(data.title, style)
+    self.text = new window.PIXI.Text(data.title, style)
     self.text.y = -self.ball.height / 2
     self.text.x = self.ball.width / 2
     self.container.addChild(self.text)
@@ -156,7 +157,7 @@ function Ball2(config = {}) {
   }
 
   self.command.hp = data => {
-    var hp = data.hp
+    let hp = data.hp
 
     // Reduce damage
     if (hp < 0 && s2.isRun) {
@@ -168,14 +169,14 @@ function Ball2(config = {}) {
       time: data.time,
       style: {
         fill: '0xFF0000',
-        fontSize: data.isCrit ? $4_point : $2_point
+        fontSize: data.isCrit ? window.$4_point : window.$2_point
       }
     })
 
     self.buildHp()
 
     if (self.hp <= 0) {
-      $command({
+      window.$command({
         name: 'gameOver',
         id: config.id
       })
@@ -183,7 +184,7 @@ function Ball2(config = {}) {
   }
 
   self.buildWeaponPosition = () => {
-    const position = $helper.positionWeaponByDirect(self.direct, self.ball)
+    const position = window.$helper.positionWeaponByDirect(self.direct, self.ball)
     self.weapon.angle = position.angle
     self.weapon.x = position.x
     self.weapon.y = position.y
@@ -202,10 +203,10 @@ function Ball2(config = {}) {
 
   self.buildSkill = () => {
     if (!config.isMe) return false
-    document.querySelector('.untimate .skill-1').innerHTML = `<img src="${namespace}/s1-icon.svg">`
-    document.querySelector('.untimate .skill-2').innerHTML = `<img src="${namespace}/s2-icon.svg">`
-    document.querySelector('.untimate .skill-3').innerHTML = `<img src="${namespace}/s3-icon.svg">`
-    document.querySelector('.untimate .untimate-skill').innerHTML = `<img src="${namespace}/s4-icon.svg">`
+    document.querySelector('.ultimate .skill-1').innerHTML = `<img src="${namespace}/s1-icon.svg">`
+    document.querySelector('.ultimate .skill-2').innerHTML = `<img src="${namespace}/s2-icon.svg">`
+    document.querySelector('.ultimate .skill-3').innerHTML = `<img src="${namespace}/s3-icon.svg">`
+    document.querySelector('.ultimate .ultimate-skill').innerHTML = `<img src="${namespace}/s4-icon.svg">`
   }
 
   // S1
@@ -222,7 +223,7 @@ function Ball2(config = {}) {
       if (!s1.isEnabled) return
       if (self.isLockSkill) return
 
-      $command({
+      window.$command({
         id: window.id,
         name: 's1'
       })
@@ -231,23 +232,20 @@ function Ball2(config = {}) {
     }
 
     let count = 0
-    var isHit = false
-    const crit = $helper.getRandomFrom(s3.critMin, s3.critMax)
+    let isHit = false
+    const crit = window.$helper.getRandomFrom(s3.critMin, s3.critMax)
     const isCrit = crit > s3.critMax / 2
-    if (isCrit) {
-      self.weapon.texture = weaponS4Texture
-    }
 
     const currenDirect = [...self.direct]
 
     requestAnimationFrame(function start() {
-      if (!isHit) {
-        for (let i in $players) {
-          if (i == config.id) continue
-          isHit = $helper.isHit(self.weapon, $players[i].ball.ball)
+      if (config.isMe && !isHit) {
+        for (let i in window.$players) {
+          if (i === config.id) continue
+          isHit = window.$helper.isHit(self.weapon, window.$players[i].ball.ball)
 
           if (config.isMe && isHit) {
-            $command({
+            window.$command({
               name: 'hp',
               hp: -(s1.atk + crit),
               isCrit: isCrit,
@@ -295,7 +293,7 @@ function Ball2(config = {}) {
       if (!s2.isEnabled) return
       if (self.isLockSkill) return
 
-      $command({
+      window.$command({
         id: window.id,
         name: 's2'
       })
@@ -333,12 +331,12 @@ function Ball2(config = {}) {
   const s4 = {
     isEnabled: true,
     isRun: false,
-    speedUp: $2_point,
-    speedUpEnd: 1.2 * $point,
+    speedUp: window.$2_point,
+    speedUpEnd: 1.2 * window.$point,
     speedUpTime: 1000,
     time: 9000,
-    weaponWidth: $6_point,
-    weaponHeight: $20_point,
+    weaponWidth: window.$6_point,
+    weaponHeight: window.$20_point,
     s1Atk: 130
   }
 
@@ -346,17 +344,17 @@ function Ball2(config = {}) {
     if (config.isMe) {
       if (!s4.isEnabled) return
       if (self.isLockSkill) return
-      $command({
+      window.$command({
         id: window.id,
         name: 's4'
       })
       s4.isEnabled = false
       s2.isEnabled = false
     }
-    document.querySelector('.untimate-skill').innerHTML = ''
+    document.querySelector('.ultimate-skill').innerHTML = ''
     s4.isRun = true
     const weaponWidthOrg = self.weapon.width
-    const weaponheightOrg = self.weapon.height
+    const weaponHeightOrg = self.weapon.height
     const s1AtkOld = s1.atk
 
     self.weapon.texture = weaponS4Texture
@@ -377,7 +375,7 @@ function Ball2(config = {}) {
       self.weapon.texture = weaponTexture
       self.ball.texture = ballTexture
       self.weapon.width = weaponWidthOrg
-      self.weapon.height = weaponheightOrg
+      self.weapon.height = weaponHeightOrg
       self.speed = speedOrg
       s1.atk = s1AtkOld
       s2.isEnabled = true

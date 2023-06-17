@@ -1,24 +1,25 @@
-function onSetup() {
-  window.isGameOver = false;
-  $players = null;
-  try {
-    $players = JSON.parse($helper.getCookie('players'));
-  } catch (e) {
-    $players = null;
-  }
+window.onSetup = () => {
+  window.isGameOver = false
+  window.isGameBuilt = false
+  window.socket.on('connect', () => {
+    window.socket.on('ROOM_DETAIL', data => {
+      if (!data) window.location.href = '/room'
+      if (data.status === 1) window.location.href = '/select'
 
-  if (!$players) {
-    $helper.setCookie('roomId', '');
-    window.location.href = '/room'
-  }
-  
-  socket.on('COMMAND', data => {
-    if (window.isGameOver) return false;
+      if (!window.isGameBuilt) {
+        window.$room = data
+        window.$players = window.$room.players
+        window.buildGame()
+      }
+    })
+    window.socket.on('COMMAND', data => {
+      if (window.isGameOver) return false
 
-    if (data.name === 'gameOver') {
-      const statusText = data.id === window.id ? '<div class="lose-text">You lose!</div>' : '<div class="win-text">You win</div>';
-      $helper.setCookie('players', '');
-      document.querySelector('#dialog').innerHTML = `
+      if (data.name === 'gameOver') {
+        const statusText =
+          data.id === window.id ? '<div class="lose-text">You lose!</div>' : '<div class="win-text">You win</div>'
+        window.$helper.setCookie('players', '')
+        document.querySelector('#dialog').innerHTML = `
         <div class="dialog">
         <div class="dialog-content">
           <div class="status-text">${statusText}</div>
@@ -27,121 +28,120 @@ function onSetup() {
         </div>
       </div>
       `
-      window.isGameOver = true;
-      return false;
-    }
-    $players[data.id].ball.command[data.name](data);
-  });
- 
-  $pixi = new PIXI.Application({ 
+        window.isGameOver = true
+        return false
+      }
+      window.$players[data.id].ball.command[data.name](data)
+    })
+  })
+}
+
+window.buildGame = () => {
+  window.isGameBuilt = true
+  // eslint-disable-next-line no-undef
+  window.$pixi = new window.PIXI.Application({
     width: innerHeight * 1.6,
     height: innerHeight,
-    background: '#FFFFFF',
-  });
+    background: '#FFFFFF'
+  })
 
-  document.querySelector('bxb').appendChild($pixi.view);
+  document.querySelector('bxb').appendChild(window.$pixi.view)
 
-  $point = innerHeight / 100;
-  $1_point = $point;
-  $2_point = 2 * $point;
-  $3_point = 3 * $point;
-  $4_point = 4 * $point;
-  $5_point = 5 * $point;
-  $6_point = 6 * $point;
-  $7_point = 7 * $point;
-  $8_point = 8 * $point;
-  $9_point = 9 * $point;
-  $10_point = 10 * $point;
-  $15_point = 15 * $point;
-  $20_point = 20 * $point;
-  $30_point = 30 * $point;
-  $40_point = 40 * $point;
-  $50_point = 50 * $point;
-  $100_point = 100 * $point;
+  window.$point = innerHeight / 100
+  window.$1_point = window.$point
+  window.$2_point = 2 * window.$point
+  window.$3_point = 3 * window.$point
+  window.$4_point = 4 * window.$point
+  window.$5_point = 5 * window.$point
+  window.$6_point = 6 * window.$point
+  window.$7_point = 7 * window.$point
+  window.$8_point = 8 * window.$point
+  window.$9_point = 9 * window.$point
+  window.$10_point = 10 * window.$point
+  window.$15_point = 15 * window.$point
+  window.$20_point = 20 * window.$point
+  window.$30_point = 30 * window.$point
+  window.$40_point = 40 * window.$point
+  window.$50_point = 50 * window.$point
+  window.$100_point = 100 * window.$point
 
-  for (let i in $players) {
-    const isMe = window.id === i;
+  for (let i in window.$players) {
+    const isMe = window.id === i
     if (isMe) {
-      document.querySelector('#bar-me').setAttribute('user-id', i);
+      document.querySelector('#bar-me').setAttribute('user-id', i)
     } else {
-      document.querySelector('#bar-other').setAttribute('user-id', i);
-      document.querySelector('.side .user-name').innerHTML = $players[i].userName;
+      document.querySelector('#bar-other').setAttribute('user-id', i)
+      document.querySelector('.side .user-name').innerHTML = window.$players[i].userName
     }
 
-    $players[i].ball = new window[`Ball${$players[i].ballId}`]({
+    window.$players[i].ball = new window[`Ball${window.$players[i].ballId}`]({
       id: i,
-      isMe: isMe, 
-      x: window.roomId === i ? $10_point : $pixi.screen.width - $10_point,
-      y: 100*$point/2,
-      direct: window.roomId === i ? ['x', 1] : ['x', -1]
-    });
+      isMe: isMe,
+      x: window.$players[i].isKey ? window.$10_point : window.$pixi.screen.width - window.$10_point,
+      y: (100 * window.$point) / 2,
+      direct: window.$players[i].isKey ? ['x', 1] : ['x', -1]
+    })
   }
 
-  document.addEventListener("keydown", function(event) {
-    if (event.which == 68) {
-      $players[id].ball.ctrl.move({
+  document.addEventListener('keydown', event => {
+    if (event.which === 68) {
+      window.$players[window.id].ball.ctrl.move({
         key: 'right'
-      });
+      })
     }
 
-    if (event.which == 87) {
-      $players[id].ball.ctrl.move({
+    if (event.which === 87) {
+      window.$players[window.id].ball.ctrl.move({
         key: 'up'
-      });
+      })
     }
 
-    if (event.which == 65) {
-      $players[id].ball.ctrl.move({
+    if (event.which === 65) {
+      window.$players[window.id].ball.ctrl.move({
         key: 'left'
-      });
+      })
     }
 
-    if (event.which == 83) {
-      $players[id].ball.ctrl.move({
+    if (event.which === 83) {
+      window.$players[window.id].ball.ctrl.move({
         key: 'down'
-      });
+      })
     }
-  });
+  })
 
-  document.addEventListener("keyup", function(event) {
+  document.addEventListener('keyup', function (event) {
     if ([68, 65, 87, 83].indexOf(event.which) > -1) {
-      $players[id].ball.ctrl.move({
+      window.$players[window.id].ball.ctrl.move({
         key: 'stop'
-      });
+      })
     }
-  });
+  })
 
-  document.addEventListener("keypress", function(event) {
-    if (event.which == 106) {
-      return $players[id].ball.ctrl.s1();
+  document.addEventListener('keypress', function (event) {
+    if (event.which === 106) {
+      return window.$players[window.id].ball.ctrl.s1()
     }
     if (event.keyCode === 107) {
-      return $players[id].ball.ctrl.s2();
+      return window.$players[window.id].ball.ctrl.s2()
     }
     if (event.keyCode === 108) {
-      return $players[id].ball.ctrl.s3();
+      return window.$players[window.id].ball.ctrl.s3()
     }
     if (event.keyCode === 111) {
-      return $players[id].ball.ctrl.s4();
+      return window.$players[window.id].ball.ctrl.s4()
     }
-  });
-  
-  // window.onbeforeunload = function() {  
-  //   $helper.setCookie('roomId', '');
-  //   $helper.setCookie('players', '');
-  //   return "";
-  // }
+  })
 }
 
-function $command (data) {
-  socket.emit('COMMAND', data);
+window.$command = data => {
+  window.socket.emit('COMMAND', data)
 }
 
-function $goSelectPage () {
-  window.location.href = '/select';
+window.$goSelectPage = () => {
+  window.location.href = '/select'
 }
 
-function $goRoomPage () {
-  $helper.setCookie('roomId', '');
-  window.location.href = '/room';
+window.$goRoomPage = () => {
+  window.$helper.setCookie('roomId', '')
+  window.location.href = '/room'
 }
