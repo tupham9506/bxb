@@ -10,24 +10,24 @@
   "tip": "",
   "skills": [
     {
-      "name": "Hỏa Cầu",
+      "name": "Tấn công",
       "image": "components/balls/2/s1-icon.svg",
-      "description": ""
+      "description": "Sử dụng thanh kiếm 2kg chém mạnh xuống và gây 100 sát thương."
     },
     {
-      "name": "Hàn Băng",
+      "name": "Lá chắn Vibranium",
       "image": "components/balls/2/s2-icon.svg",
-      "description": ""
+      "description": "Giảm 80% sát thương nhận vào trong 5 giây."
     },
     {
-      "name": "Vùng đất chết",
+      "name": "Nhát chém ân huệ",
       "image": "components/balls/2/s3-icon.svg",
-      "description": ""
+      "description": "[Kỹ năng bị động] Khi tấn công sẽ có xác suất gây thêm tối đa 50 sát thương."
     },
     {
       "name": "Một mất một còn",
       "image": "components/balls/2/s4-icon.svg",
-      "description": ""
+      "description": "Vứt bỏ khiên và lao vào đối thủ. Trong 10 giây, không thể sử dụng \"Lá chắn Vibranium\", tăng sát thương cơ bản 130, tăng mạnh 200% tốc độ chạy trong 1 giây và giảm xuống 120%."
     }
   ]
 }

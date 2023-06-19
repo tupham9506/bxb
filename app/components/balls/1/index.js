@@ -19,7 +19,14 @@ function Ball1(config = {}) {
   self.container.x = config.x || 0
   self.container.y = config.y || 0
 
-  self.ball = window.PIXI.Sprite.from(namespace + 'ball.svg')
+  const ballTexture = window.PIXI.Texture.from(namespace + 'ball.svg')
+  const s1Texture = window.PIXI.Texture.from(namespace + 's1.svg')
+  const s2Texture = window.PIXI.Texture.from(namespace + 's2.svg')
+  const s3Texture = window.PIXI.Texture.from(namespace + 's3.svg')
+  const s3EndTexture = window.PIXI.Texture.from(namespace + 's3-end.svg')
+  const s4Texture = window.PIXI.Texture.from(namespace + 's4.svg')
+
+  self.ball = new window.PIXI.Sprite(ballTexture)
   self.ball.width = window.$10_point
   self.ball.height = window.$10_point
   self.ball.anchor.set(0.5)
@@ -31,7 +38,7 @@ function Ball1(config = {}) {
 
   // Control define
   self.ctrl.left = () => {
-    if (self.container.x <= 0) return
+    if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     if (self.isLockMove) return
     self.container.x -= self.speed
     self.direct = ['x', -1]
@@ -46,7 +53,7 @@ function Ball1(config = {}) {
   }
 
   self.ctrl.right = () => {
-    if (self.container.x + self.ball.width >= window.$pixi.screen.width) return
+    if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
     self.container.x += self.speed
     self.direct = ['x', +1]
     window.$command({
@@ -60,7 +67,7 @@ function Ball1(config = {}) {
   }
 
   self.ctrl.up = () => {
-    if (self.container.y <= 0) return
+    if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
     self.container.y -= self.speed
     self.direct = ['y', -1]
     window.$command({
@@ -74,7 +81,7 @@ function Ball1(config = {}) {
   }
 
   self.ctrl.down = () => {
-    if (self.container.y + self.ball.height >= window.$pixi.screen.height) return
+    if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
     self.container.y += self.speed
     self.direct = ['y', +1]
     window.$command({
@@ -180,7 +187,7 @@ function Ball1(config = {}) {
 
   // S1
   const s1 = {
-    src: window.PIXI.Sprite.from(namespace + 's1.svg'),
+    src: new window.PIXI.Sprite(s1Texture),
     isEnabled: true,
     atk: 100,
     speed: window.$1_point
@@ -249,7 +256,7 @@ function Ball1(config = {}) {
 
   // S2
   const s2 = {
-    src: window.PIXI.Sprite.from(namespace + 's2.svg'),
+    src: new window.PIXI.Sprite(s2Texture),
     isEnabled: true,
     atk: 50,
     speed: window.$1_point,
@@ -328,12 +335,12 @@ function Ball1(config = {}) {
 
   // S3
   const s3 = {
-    src: window.PIXI.Sprite.from(namespace + 's3.svg'),
+    src: new window.PIXI.Sprite(s3Texture),
     isEnabled: true,
     atk: 150,
     speed: window.$1_point,
     range: window.$40_point,
-    endSrc: window.PIXI.Sprite.from(namespace + 's3-end.svg'),
+    endSrc: new window.PIXI.Sprite(s3EndTexture),
     endSize: window.$20_point,
     endTime: 1
   }
@@ -422,7 +429,7 @@ function Ball1(config = {}) {
 
   // S4
   const s4 = {
-    src: window.PIXI.Sprite.from(namespace + 's4.svg'),
+    src: new window.PIXI.Sprite(s4Texture),
     isEnabled: true,
     atk: 400,
     speed: window.$2_point

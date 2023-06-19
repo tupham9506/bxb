@@ -19,8 +19,10 @@
 }
 
 #ball .guide {
-  font-size: 16px;
+  font-size: 20px;
   margin-bottom: 10px;
+  color: var(--color-white);
+  text-shadow: 0px 0px 2px #000;
 }
 
 .ball-container {
@@ -31,7 +33,6 @@
 .ball-item {
   width: 100px;
   height: 100px;
-  border: 1px solid #000000;
   display: flex;
   flex-wrap: wrap;
   cursor: pointer;
@@ -62,7 +63,7 @@
 }
 
 .selected-ball .ball-nickname {
-  font-size: 14px;
+  font-size: 20px;
 }
 
 .selected-ball .ball-image {
@@ -114,15 +115,6 @@
   float: right;
 }
 
-.skill-image {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  border: 1px solid #000000;
-  background-color: var(--color-white);
-  padding: 3px;
-}
-
 .selected-ball .tip {
   white-space: normal;
   font-size: 16px;
@@ -141,6 +133,9 @@
 .header {
   padding: 10px;
   text-align: center;
+  text-transform: lowercase;
+  box-shadow: 1px 1px 5px 3px rgba(0, 0, 0, 0.5);
+
 }
 #player1 .header {
   background-color: var(--color-blue);
@@ -148,6 +143,7 @@
 }
 .header .user-name {
   color: #FFFFFF;
+  font-family: digital;
 }
 
 #player2 .header {
@@ -188,11 +184,9 @@
 
 .control-guide {
   display: flex;
-  font-size: 14px;
+  font-size: 20px;
   flex-direction: column;
   gap: 20px;
-  color: var(--color-gray);
-  background-color: var(--color-gray-light);
   padding: 20px;
   margin-top: auto;
 }
@@ -200,11 +194,39 @@
 .control-guide-line {
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 15px;
+}
+
+.control-guide-content {
+  margin-bottom: 10px;
+}
+
+.control-guide-header {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.control-guide-header .skill-image {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  border: 1px solid #000000;
+  padding: 3px;
+}
+
+.control-guide-header .skill-name {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
 }
 
 .control-button {
   border: 1px solid var(--color-gray);
-  padding: 4px 10px;
-  display: inline-block;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

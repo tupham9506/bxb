@@ -15,6 +15,12 @@
   justify-content: space-between;
 }
 
+.room-list-title {
+  color: var(--color-white);
+  font-size: 50px;
+  text-shadow: 0px 0px 2px #000;
+}
+
 #roomList {
   display: flex;
   gap: 10px;
@@ -24,7 +30,6 @@
 }
 
 .room-item {
-  border: 1px solid var(--color-black);
   width: 200px;
   padding: 10px;
   cursor: pointer;
@@ -41,10 +46,12 @@
 }
 
 .user-list-container {
-  background-color: var(--color-gray-light);
   height: 100%;
   width: 350px;
   padding: 10px;
+  border: unset;
+  border-left: 1px solid rgba(255, 255, 255, 1);
+  border-radius: unset;
 }
 
 #userList {
@@ -54,12 +61,14 @@
 }
 
 .user-item {
-  border-bottom: 1px dashed var(--color-black);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
+  padding: 10px;
 }
 
 .user-id {
   color: var(--color-gray);
-  font-size: 14px;
+  font-size: 20px;
 }
 
 .footer {

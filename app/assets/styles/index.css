@@ -4,7 +4,9 @@ html, body {
 }
 
 .title {
-  font-size: 50px;
+  font-size: 100px;
+  color: #fff;
+  font-weight: bold;
 }
 
 .logo {
@@ -17,7 +19,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 40%;
+  padding: 50px;
 }
 
 .menu {
@@ -25,7 +27,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 60%;
+  flex: 1
 }
 
 .btn {
@@ -44,7 +46,8 @@ html, body {
   bottom: 10px;
   left: 10px;
   color: #000000;
-  font-size: 14px;
+  font-size: 20px;
+  color: var(--color-white)
 }
 
 .link a {

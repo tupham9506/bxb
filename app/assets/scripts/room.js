@@ -17,7 +17,7 @@ window.onSetup = () => {
       let template = ``
       data.forEach(item => {
         template += `
-          <div class="room-item" onclick="joinRoom('${item.id}')">
+          <div class="room-item card" onclick="joinRoom('${item.id}')">
             <div class="user-name">${item.roomName}</div>
             <div class="user-number"><img src="assets/images/character.svg"><div>${
               Object.keys(item.players).length || 0

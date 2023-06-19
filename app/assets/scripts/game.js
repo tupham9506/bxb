@@ -1,4 +1,6 @@
 window.onSetup = () => {
+  // (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
+
   window.isGameOver = false
   window.isGameBuilt = false
   window.socket.on('connect', () => {
@@ -42,8 +44,19 @@ window.buildGame = () => {
   window.$pixi = new window.PIXI.Application({
     width: innerHeight * 1.6,
     height: innerHeight,
-    background: '#FFFFFF'
+    background: '#FFFFFF',
+    antialias: true,
+    transparent: false,
+    resolution: 1
   })
+
+  const backgroundTexture = window.PIXI.Texture.from('assets/images/game-bg.avif')
+  let background = new window.PIXI.Sprite(backgroundTexture)
+  background.x = 0
+  background.y = 0
+  background.width = window.innerWidth
+  background.height = window.innerHeight
+  window.$pixi.stage.addChild(background)
 
   document.querySelector('bxb').appendChild(window.$pixi.view)
 
@@ -131,6 +144,26 @@ window.buildGame = () => {
       return window.$players[window.id].ball.ctrl.s4()
     }
   })
+
+  // if (window.id !== window.$room.userId) {
+  //   var count = 0
+  //   setInterval(() => {
+  //     window.$players[window.id].ball.ctrl.s1()
+  //     window.$players[window.id].ball.ctrl.s2()
+  //     window.$players[window.id].ball.ctrl.s3()
+  //     if (count >= 100) {
+  //       window.$players[window.id].ball.ctrl.move({
+  //         key: 'right'
+  //       })
+  //       count--
+  //     } else if (count <= 100) {
+  //       window.$players[window.id].ball.ctrl.move({
+  //         key: 'left'
+  //       })
+  //       count++
+  //     }
+  //   }, 1)
+  // }
 }
 
 window.$command = data => {

@@ -2,7 +2,6 @@
   display: flex;
   padding: 0;
   margin: 0;
-  background-color: red;
 }
 
 bxb canvas {
@@ -10,12 +9,12 @@ bxb canvas {
 }
 
 .side {
-  background-color: var(--color-gray-light);
   display: flex;
   flex-direction: column;
   width: 100%;
   justify-content: space-between;
   padding: 15px;
+  background: rgba(255, 255, 255, 0.7)
 }
 
 .skill-container {

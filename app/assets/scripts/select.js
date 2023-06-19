@@ -4,7 +4,7 @@ window.onSetup = () => {
   let ballTemplate = ''
   for (let i in window.BALLS) {
     ballTemplate += `
-      <div class="ball-item" onclick="selectBall(${i}, this)">
+      <div class="ball-item card" onclick="selectBall(${i}, this)">
         <img src="${window.BALLS[i].image}" />
       </div>
     `
@@ -84,10 +84,14 @@ window.selectBall = (id, self) => {
 function buildSelectBall(id, ballId) {
   const ball = window.BALLS[ballId]
   let skillTemplate = ''
-  for (let skill of ball.skills) {
-    skillTemplate += `
-      <div class="skill-image"><img src="${skill.image}"></div>
-    `
+
+  for (let i in ball.skills) {
+    let skill = ball.skills[i]
+
+    const selector = document.querySelector(`.control-guide-content.s${+i + 1}`)
+    selector.querySelector('.skill-name').innerHTML = skill.name
+    selector.querySelector('.skill-image').innerHTML = `<img src="${skill.image}">`
+    selector.querySelector(`.skill-desciption`).innerHTML = skill.description
   }
 
   document.querySelector(`[user-id="${id}"] .selected-ball-container`).innerHTML = `
