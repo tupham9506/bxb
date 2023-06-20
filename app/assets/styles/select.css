@@ -9,6 +9,7 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 .header-title {
@@ -20,65 +21,128 @@
 
 #ball .guide {
   font-size: 20px;
+}
+
+.ball-table {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 10px;
+  margin-top: 60px;
   margin-bottom: 10px;
-  color: var(--color-white);
-  text-shadow: 0px 0px 2px #000;
 }
 
 .ball-container {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 }
+
 .ball-item {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   display: flex;
   flex-wrap: wrap;
   cursor: pointer;
   padding: 10px;
+  position: relative;
+  z-index: 100;
+}
+
+.ball-item:hover {
+  box-shadow: inset 5px 5px 18px var(--color-white)
 }
 
 .ball-item.active-1 {
-  outline: 3px solid #025f62;
+  box-shadow: inset 5px 5px 18px var(--color-white);
+  outline: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.ball-item-description {
+  position: absolute;
+  right: 30px;
+  bottom: -10px;
+  z-index: 100;
+}
+
+.ball-item-description::after {
+  content: "";
+  position: relative;
 }
 
 .selected-ball-container {
   margin-bottom: auto;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.selected-ball {
-  border: 1px solid var(--color-black);
+.selected-ball-container .selected-ball-item {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid var(--color-white);
+  box-shadow: inset 5px 5px 8px var(--color-white);
+  display: flex;
+  flex-wrap: wrap;
+  cursor: pointer;
   padding: 10px;
-  margin-top: 30px;
+  position: relative;
+  z-index: 100;
+}
+
+
+.selected-ball {
+  width: 500px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-gray-light);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-green);
+}
+
+.selected-ball-header {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 5px;
+}
+
+.selected-ball-header .img-container {
+  width: 150px;
+  height: 150px;
+  border: 1px solid var(--color-black);
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.selected-ball .ball-name-container {
+  text-align: center;
 }
 
 .selected-ball .ball-name {
-  padding-bottom: 10px;
-  text-align: center;
+  font-family: digital;
+  text-transform: lowercase;
+  color: var(--color-red);
 }
 
 .selected-ball .ball-nickname {
   font-size: 20px;
 }
 
-.selected-ball .ball-image {
-  height: 250px;
-  border: 1px solid var(--color-black);
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-  background-color: var(--color-white);
-  padding: 50px;
+.detail-container {
+  flex: 1
 }
 
 .selected-ball .skill-table {
-  white-space: nowrap;
   width: 100%;
+  padding: 0 20px;
 }
 
 .skill-table .skill-title {
@@ -96,23 +160,26 @@
 
 .index-container {
   width: 100%;
-  height: 20px;
-  border: 1px solid #000000;
+  height: 10px;
+  border: 1px solid var(--color-green);
+  box-shadow: inset 0 0 3px var(--color-green);
   color: var(--color-white);
+  border-radius: 5px;
 }
 
 .index-container .index {
   height: 100%;
-  background-color: var(--color-black);
+  background-color: var(--color-green);
   padding: 3px;
   font-size: 16px;
 }
 
 .skill {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 10px;
-  float: right;
+  font-size: 16px;
+  line-height: 14px;
 }
 
 .selected-ball .tip {
@@ -141,6 +208,16 @@
   background-color: var(--color-blue);
   border: 5px solid var(--color-blue-light);
 }
+
+.back-button {
+  min-width: 70px;
+  padding: 8px;
+}
+
+.back-button img {
+  height: 100%;
+}
+
 .header .user-name {
   color: #FFFFFF;
   font-family: digital;
@@ -151,13 +228,17 @@
   border: 5px solid var(--color-red-light);
 }
 
-.ready-status .ready-false {
+.ready-status {
+  color: var(--color-white);
+  font-size: 40px;
+}
+/* .ready-status .ready-false {
   color: var(--color-red);
 }
 
 .ready-status .ready-true {
   color: var(--color-blue);
-}
+} */
 
 #waitingList {
   width: 100%;
@@ -186,34 +267,40 @@
   display: flex;
   font-size: 20px;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
   margin-top: auto;
+  gap: 10px;
 }
 
 .control-guide-line {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 15px;
+  gap: 5px;
 }
 
-.control-guide-content {
-  margin-bottom: 10px;
+.guide-line-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .control-guide-header {
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  gap: 5px;
+}
+
+.control-guide-content {
+  padding: 5px 0;
 }
 
 .control-guide-header .skill-image {
   width: 28px;
   height: 28px;
   display: flex;
-  border: 1px solid #000000;
-  padding: 3px;
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+  padding: 5px;
 }
 
 .control-guide-header .skill-name {

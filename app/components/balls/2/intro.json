@@ -20,9 +20,9 @@
       "description": "Giảm 80% sát thương nhận vào trong 5 giây."
     },
     {
-      "name": "Nhát chém ân huệ",
+      "name": "Nhát chém ân huệ [Bị động]",
       "image": "components/balls/2/s3-icon.svg",
-      "description": "[Kỹ năng bị động] Khi tấn công sẽ có xác suất gây thêm tối đa 50 sát thương."
+      "description": "Khi tấn công sẽ có xác suất gây thêm tối đa 50 sát thương."
     },
     {
       "name": "Một mất một còn",

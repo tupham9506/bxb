@@ -4,8 +4,9 @@ window.onSetup = () => {
   let ballTemplate = ''
   for (let i in window.BALLS) {
     ballTemplate += `
-      <div class="ball-item card" onclick="selectBall(${i}, this)">
+      <div class="ball-item card" onmouseenter="buildSkillDesciption(${i}, this)" onmouseleave="buildSkillDesciption(0, this)" onclick="selectBall(${i}, this)">
         <img src="${window.BALLS[i].image}" />
+        <div class="ball-item-description"></div>
       </div>
     `
   }
@@ -36,7 +37,7 @@ window.onSetup = () => {
           document.querySelector('.guide').innerHTML =
             '* Lựa chọn nhân vật bóng, chờ đối thủ sẵn sàng và ấn nút "Bắt đầu" trận đấu.'
           if (player.id === window.id) {
-            document.querySelector('#player1 .ready-button').innerHTML = 'Bắt đầu'
+            document.querySelector('.ready-button').innerHTML = 'Bắt đầu'
           }
         } else {
           document.querySelector('.guide').innerHTML =
@@ -82,62 +83,90 @@ window.selectBall = (id, self) => {
 }
 
 function buildSelectBall(id, ballId) {
+  document.querySelector(`[user-id="${id}"] .selected-ball-container`).innerHTML = `
+    <div class="animate__pulse selected-ball-item">
+      <img src="components/balls/${ballId}/ball.svg">
+    <div>
+  `
+}
+
+window.buildSkillDesciption = (ballId, self) => {
+  let ballSelector = self.querySelector('.ball-item-description')
+  if (!ballId) {
+    return (ballSelector.innerHTML = ``)
+  }
+
+  if (ballSelector.innerHTML) return false
+
   const ball = window.BALLS[ballId]
   let skillTemplate = ''
 
   for (let i in ball.skills) {
     let skill = ball.skills[i]
 
-    const selector = document.querySelector(`.control-guide-content.s${+i + 1}`)
-    selector.querySelector('.skill-name').innerHTML = skill.name
-    selector.querySelector('.skill-image').innerHTML = `<img src="${skill.image}">`
-    selector.querySelector(`.skill-desciption`).innerHTML = skill.description
+    skillTemplate += `
+      <div class="control-guide-content s1">
+        <div class="control-guide-header">
+          <div class="skill-image"><img src="${skill.image}"></div>
+          <div>
+            <div class="skill-name">${skill.name}</div>
+            <div class="skill-desciption">${skill.description}</div>
+          </div>
+        </div>
+      </div>
+    `
   }
 
-  document.querySelector(`[user-id="${id}"] .selected-ball-container`).innerHTML = `
-    <div class="selected-ball">
-      <div class="ball-name">
-        <div>${ball.name}</div>
-        <div class="ball-nickname">${ball.nickname}</div>
+  ballSelector.innerHTML = `
+    <div class="selected-ball card">
+      <div class="selected-ball-header">
+        <div class="img-container">
+          <img src="components/balls/${ballId}/ball.svg">
+        </div>
+        <div class="detail-container">
+          <div class="ball-name-container">
+            <div class="ball-name">${ball.name}</div>
+            <div class="ball-nickname">${ball.nickname}</div>
+          </div>
+          <table class="skill-table">
+            <tr>
+              <td class="skill-title"><img src="assets/images/hearts.svg"></td>
+              <td>
+                <div class="index-container">
+                  <div class="index" style="width:${getIndexPercent('hp', ball.hp)}%"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="skill-title"><img src="assets/images/two-handed-sword.svg"></td>
+              <td>
+                <div class="index-container">
+                  <div class="index" style="width:${getIndexPercent('strength', ball.strength)}%"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="skill-title"><img src="assets/images/arrow-dunk.svg"></td>
+              <td>
+                <div class="index-container">
+                  <div class="index" style="width:${getIndexPercent('range', ball.range)}%"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="skill-title"><img src="assets/images/run.svg"></td>
+              <td>
+                <div class="index-container">
+                  <div class="index" style="width:${getIndexPercent('speed', ball.speed)}%"></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div> 
       </div>
-      <div class="ball-image"><img src="${ball.image}"></div>
-      <table class="skill-table">
-        <tr>
-          <td class="skill-title"><img src="assets/images/hearts.svg"></td>
-          <td>
-            <div class="index-container">
-              <div class="index" style="width:${getIndexPercent('hp', ball.hp)}%"></div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="skill-title"><img src="assets/images/two-handed-sword.svg"></td>
-          <td>
-            <div class="index-container">
-              <div class="index" style="width:${getIndexPercent('strength', ball.strength)}%"></div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="skill-title"><img src="assets/images/arrow-dunk.svg"></td>
-          <td>
-            <div class="index-container">
-              <div class="index" style="width:${getIndexPercent('range', ball.range)}%"></div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="skill-title"><img src="assets/images/run.svg"></td>
-          <td>
-            <div class="index-container">
-              <div class="index" style="width:${getIndexPercent('speed', ball.speed)}%"></div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2"><div class="skill">${skillTemplate}</div></td>
-        </tr>
-      </table>
+      
+
+      <div class="skill">${skillTemplate}</div>
     </div>
   `
 }

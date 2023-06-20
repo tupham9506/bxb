@@ -5,6 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ball x balL</title>
+  <link rel="stylesheet" href="libs/animate/animate.css">
   <link rel="stylesheet" href="assets/styles/common.css">
   <link rel="stylesheet" href="assets/styles/base.css">
   <link rel="stylesheet" href="assets/styles/select.css">
@@ -16,54 +17,31 @@
         <div class="user-name"></div>  
       </div>
       <div class="selected-ball-container"></div>
-      <div><button type="button" class="btn full ready-button" onclick="startGame()">Sẵn sàng</button></div>
+      <div>
+        <a href="/" class="btn back-button"><img src="assets/images/back.svg"></a>
+      </div>
     </div>
     <div id="ball">
       <div></div>
-      <div class="header-title">VS</div>
-      <div class="guide"></div>
-      <div class="ball-container"></div>
-      <div class="control-guide card">
-        <div class="control-guide-line-skill">
-          <div class="control-guide-content s1">
-            <div class="control-guide-header">
-              <div class="control-button">J</div>
-              <div class="skill-image"></div>
-              <div class="skill-name"></div>
-            </div>
-            <div class="skill-desciption"></div>
-          </div>
-          <div class="control-guide-content s2">
-            <div class="control-guide-header">
-              <div class="control-button">K</div>
-              <div class="skill-image"></div>
-              <div class="skill-name"></div>
-            </div>
-            <div class="skill-desciption"></div>
-          </div>
-          <div class="control-guide-content s3">
-            <div class="control-guide-header">
-              <div class="control-button">L</div>
-              <div class="skill-image"></div>
-              <div class="skill-name"></div>
-            </div>
-            <div class="skill-desciption"></div>
-          </div>
-          <div class="control-guide-content s4">
-            <div class="control-guide-header">
-              <div class="control-button">O</div>
-              <div class="skill-image"></div>
-              <div class="skill-name"></div>
-            </div>
-            <div class="skill-desciption"></div>
+      <!-- <div class="header-title">VS</div> -->
+      <div class="card ball-table">
+        <div class="ball-container"></div>
+        <div class="control-guide">
+          <div class="control-guide-line"><div class="guide"></div></div>
+          <div class="control-guide-line">
+            <div class="guide-line-item"><div class="control-button">A</div></div>
+            <div class="guide-line-item"><div class="control-button">D</div></div>
+            <div class="guide-line-item"><div class="control-button">W</div></div>
+            <div class="guide-line-item"><div class="control-button">S</div></div>
+            <div class="guide-line-item"><div class="control-button">J</div></div>
+            <div class="guide-line-item"><div class="control-button">K</div></div>
+            <div class="guide-line-item"><div class="control-button">L</div></div>
+            <div class="guide-line-item"><div class="control-button">O</div></div>
           </div>
         </div>
-        <div class="control-guide-line">
-          <div class="control-button">A</div><div>Trái</div>
-          <div class="control-button">D</div><div>Phải</div>
-          <div class="control-button">W</div><div>Lên</div>
-          <div class="control-button">S</div><div>Xuống</div>
-        </div>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn red ready-button" onclick="startGame()">Sẵn sàng</button>
       </div>
     </div>
     <div id="player2">

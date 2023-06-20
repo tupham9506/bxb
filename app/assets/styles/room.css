@@ -38,8 +38,9 @@
 .room-item .user-number {
   display: flex;
   flex-direction: row;
-  font-size: 16px;
- }
+  font-size: 25px;
+}
+
 .room-item .user-number img {
   width: 16px;
   margin-right: 5px;
@@ -71,9 +72,22 @@
   font-size: 20px;
 }
 
-.footer {
+.room-footer {
   width: 100%;
   display: flex;
   padding: 20px;
-  justify-content: space-between;
+}
+
+.room-footer > * {
+  flex: 1
+}
+
+.back-button {
+  min-width: 70px;
+  padding: 8px;
+  flex: 1;
+}
+
+.back-button img {
+  height: 100%;
 }
