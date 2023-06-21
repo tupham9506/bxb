@@ -1,6 +1,4 @@
 window.onSetup = () => {
-  // (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-
   window.isGameOver = false
   window.isGameBuilt = false
   window.socket.on('connect', () => {
@@ -23,9 +21,8 @@ window.onSetup = () => {
         window.$helper.setCookie('players', '')
         document.querySelector('#dialog').innerHTML = `
         <div class="dialog">
-        <div class="dialog-content">
+        <div class="dialog-content card">
           <div class="status-text">${statusText}</div>
-          <button type="button" class="btn full" onclick="$goSelectPage()">Đấu lại</button>
           <button type="button" class="btn full" onclick="$goRoomPage()">Về phòng chờ</button>
         </div>
       </div>
@@ -40,7 +37,6 @@ window.onSetup = () => {
 
 window.buildGame = () => {
   window.isGameBuilt = true
-  // eslint-disable-next-line no-undef
   window.$pixi = new window.PIXI.Application({
     width: innerHeight * 1.6,
     height: innerHeight,

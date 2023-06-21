@@ -1,5 +1,6 @@
 var path = require('path')
 const User = require('./../../models/user')
+const mongoose = require('mongoose')
 
 module.exports = app => {
   app.get('/', function (_req, res) {
@@ -9,21 +10,25 @@ module.exports = app => {
   app.get('/api/user', async (req, res) => {
     return res.json({
       data: await User.findOne({
-        _id: req.id
+        _id: req.cookies.id
       })
     })
   })
 
   app.post('/api/start', async (req, res) => {
-    if (!req.cookies.id) {
-      const user = await User.create({
-        userName: req.body.userName
-      })
-      user.id = user._id.valueOf()
-      await user.save()
+    const user = await User.findByIdAndUpdate(
+      req.cookies.id || new mongoose.mongo.ObjectId(),
+      {
+        $set: { userName: req.body.userName }
+      },
+      { upsert: true, setDefaultsOnInsert: true, new: true }
+    )
 
-      res.cookie('id', user.id)
-    }
+    user.id = user._id.valueOf()
+    await user.save()
+
+    res.cookie('id', user.id)
+
     return res.json({})
   })
 }

@@ -34,13 +34,15 @@ function Ball1(config = {}) {
   self.container.addChild(self.ball)
   self.text = null
   let currentMove = null
-  let currentMoveId = null
+  let currentMoveId = new window.PIXI.Ticker()
+  let timeout = null
 
   // Control define
-  self.ctrl.left = () => {
+  self.ctrl.left = delta => {
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     if (self.isLockMove) return
-    self.container.x -= self.speed
+    const speed = timeout ? self.speed / 2 : self.speed
+    self.container.x -= delta * speed
     self.direct = ['x', -1]
     window.$command({
       id: config.id,
@@ -49,12 +51,12 @@ function Ball1(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.left)
   }
 
-  self.ctrl.right = () => {
+  self.ctrl.right = delta => {
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
-    self.container.x += self.speed
+    const speed = timeout ? self.speed / 2 : self.speed
+    self.container.x += delta * speed
     self.direct = ['x', +1]
     window.$command({
       id: config.id,
@@ -63,12 +65,12 @@ function Ball1(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.right)
   }
 
-  self.ctrl.up = () => {
+  self.ctrl.up = delta => {
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
-    self.container.y -= self.speed
+    const speed = timeout ? self.speed / 2 : self.speed
+    self.container.y -= delta * speed
     self.direct = ['y', -1]
     window.$command({
       id: config.id,
@@ -77,12 +79,12 @@ function Ball1(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.up)
   }
 
-  self.ctrl.down = () => {
+  self.ctrl.down = delta => {
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
-    self.container.y += self.speed
+    const speed = timeout ? self.speed / 2 : self.speed
+    self.container.y += delta * speed
     self.direct = ['y', +1]
     window.$command({
       id: config.id,
@@ -91,28 +93,39 @@ function Ball1(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.down)
   }
-
   self.ctrl.move = data => {
+    if (timeout) {
+      clearTimeout(timeout)
+      timeout = null
+    }
+
     if (self.isLockMove) {
+      currentMoveId.remove(self.ctrl[currentMove])
       currentMove = null
-      cancelAnimationFrame(currentMoveId)
       return
     }
 
-    if (currentMove && data.key !== currentMove) {
-      cancelAnimationFrame(currentMoveId)
+    if (data.key !== 'stop' && currentMove && data.key !== currentMove) {
+      currentMoveId.stop()
+      currentMoveId.remove(self.ctrl[currentMove])
     }
+
     if (data.key === 'stop') {
-      currentMove = null
-      cancelAnimationFrame(currentMoveId)
+      timeout = setTimeout(() => {
+        currentMoveId.stop()
+        currentMoveId.remove(self.ctrl[currentMove])
+        currentMove = null
+      }, 150)
+
       return
     }
     if (currentMove === data.key) return
 
     currentMove = data.key
-    currentMoveId = requestAnimationFrame(self.ctrl[data.key])
+    currentMoveId.add(self.ctrl[data.key])
+    console.log(currentMoveId)
+    currentMoveId.start()
   }
 
   self.command.position = data => {
@@ -187,17 +200,42 @@ function Ball1(config = {}) {
 
   // S1
   const s1 = {
-    src: new window.PIXI.Sprite(s1Texture),
+    src: window.$helper.sprite(s1Texture, window.$5_point, window.$10_point),
+    ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 100,
     speed: window.$1_point
   }
 
-  s1.src.width = window.$5_point
-  s1.src.height = window.$10_point
-  s1.src.anchor.set(0.5)
+  s1.ticker.add(delta => {
+    if (!s1.isHit) {
+      for (let i in window.$players) {
+        if (i === config.id) continue
+        s1.isHit = window.$helper.isHit(s1.src, window.$players[i].ball.ball)
 
-  self.ctrl.s1 = () => {
+        if (config.isMe && s1.isHit) {
+          window.$command({
+            name: 'hp',
+            hp: -s1.atk,
+            id: i
+          })
+          break
+        }
+      }
+    }
+
+    const speed = s1.speed * delta
+    s1.src[s1.direct[0]] = s1.src[s1.direct[0]] + s1.direct[1] * speed
+    s1.currentRange += speed
+
+    if (s1.isHit || s1.currentRange >= window.$50_point) {
+      window.$pixi.stage.removeChild(s1.src)
+      s1.ticker.stop()
+      if (s1.currentRange >= window.$50_point) s1.isEnabled = true
+    }
+  })
+
+  s1.ctrl = () => {
     if (config.isMe) {
       if (!s1.isEnabled) return
       if (self.isLockSkill) return
@@ -209,54 +247,26 @@ function Ball1(config = {}) {
       s1.isEnabled = false
     }
 
-    const currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, currenDirect, s1.src)
+    s1.direct = [...self.direct]
+    const anchor = window.$helper.anchor(self.container, self.ball, s1.direct, s1.src)
     s1.src.x = anchor.x
     s1.src.y = anchor.y
-    s1.src.angle = window.$helper.angleByDirect(currenDirect)
+    s1.src.angle = window.$helper.angleByDirect(s1.direct)
     window.$pixi.stage.addChild(s1.src)
 
-    let count = 0
-    var isHit = false
-
-    requestAnimationFrame(function start() {
-      if (!isHit) {
-        for (let i in window.$players) {
-          if (i === config.id) continue
-          isHit = window.$helper.isHit(s1.src, window.$players[i].ball.ball)
-
-          if (config.isMe && isHit) {
-            window.$command({
-              name: 'hp',
-              hp: -s1.atk,
-              id: i
-            })
-            break
-          }
-        }
-      }
-
-      s1.src[currenDirect[0]] = s1.src[currenDirect[0]] + currenDirect[1] * s1.speed
-      count += s1.speed
-      if (isHit || count >= window.$50_point) {
-        window.$pixi.stage.removeChild(s1.src)
-        if (count >= window.$50_point) {
-          s1.isEnabled = true
-          return true
-        }
-      }
-
-      requestAnimationFrame(start)
-    })
+    s1.currentRange = 0
+    s1.isHit = false
+    s1.ticker.start()
   }
 
-  self.command.s1 = () => {
-    self.ctrl.s1()
+  self.ctrl.s1 = self.command.s1 = () => {
+    s1.ctrl()
   }
 
   // S2
   const s2 = {
-    src: new window.PIXI.Sprite(s2Texture),
+    src: window.$helper.sprite(s2Texture, window.$10_point, window.$10_point),
+    ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 50,
     speed: window.$1_point,
@@ -264,11 +274,41 @@ function Ball1(config = {}) {
     effectTime: 2000
   }
 
-  s2.src.width = window.$10_point
-  s2.src.height = window.$10_point
-  s2.src.anchor.set(0.5)
+  s2.ticker.add(delta => {
+    if (!s2.isHit) {
+      for (let i in window.$players) {
+        if (i === config.id) continue
+        s2.isHit = window.$helper.isHit(s2.src, window.$players[i].ball.ball)
 
-  self.ctrl.s2 = () => {
+        if (config.isMe && s2.isHit) {
+          window.$command({
+            name: 'lockMove',
+            effectTime: s2.effectTime,
+            id: i
+          })
+          window.$command({
+            name: 'hp',
+            hp: -s2.atk,
+            id: i,
+            title: 'Bị Đóng Băng',
+            time: s2.effectTime
+          })
+          break
+        }
+      }
+    }
+
+    const speed = s2.speed * delta
+    s2.src[s2.currenDirect[0]] = s2.src[s2.currenDirect[0]] + s2.currenDirect[1] * speed
+
+    s2.currentRange += speed
+    if (s2.isHit || s2.currentRange >= s2.range) {
+      window.$pixi.stage.removeChild(s2.src)
+      if (s2.currentRange >= window.$50_point) s2.isEnabled = true
+    }
+  })
+
+  s2.ctrl = () => {
     if (config.isMe) {
       if (!s2.isEnabled) return
       if (self.isLockSkill) return
@@ -280,79 +320,83 @@ function Ball1(config = {}) {
       s2.isEnabled = false
     }
 
-    const currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, currenDirect, s2.src)
+    s2.currenDirect = [...self.direct]
+    const anchor = window.$helper.anchor(self.container, self.ball, s2.currenDirect, s2.src)
     s2.src.x = anchor.x
     s2.src.y = anchor.y
-    s2.src.angle = window.$helper.angleByDirect(currenDirect)
+    s2.src.angle = window.$helper.angleByDirect(s2.currenDirect)
     window.$pixi.stage.addChild(s2.src)
 
-    let count = 0
-    let isHit = false
-
-    requestAnimationFrame(function start() {
-      if (!isHit) {
-        for (let i in window.$players) {
-          if (i === config.id) continue
-          isHit = window.$helper.isHit(s2.src, window.$players[i].ball.ball)
-
-          if (config.isMe && isHit) {
-            window.$command({
-              name: 'lockMove',
-              effectTime: s2.effectTime,
-              id: i
-            })
-            window.$command({
-              name: 'hp',
-              hp: -s2.atk,
-              id: i,
-              title: 'Bị Đóng Băng',
-              time: s2.effectTime
-            })
-            break
-          }
-        }
-      }
-
-      s2.src[currenDirect[0]] = s2.src[currenDirect[0]] + currenDirect[1] * s2.speed
-
-      count += s2.speed
-      if (isHit || count >= s2.range) {
-        window.$pixi.stage.removeChild(s2.src)
-        if (count >= window.$50_point) {
-          s2.isEnabled = true
-          return true
-        }
-      }
-
-      requestAnimationFrame(start)
-    })
+    s2.currentRange = 0
+    s2.isHit = false
+    s2.ticker.start()
   }
 
-  self.command.s2 = () => {
-    self.ctrl.s2()
+  self.ctrl.s2 = self.command.s2 = () => {
+    s2.ctrl()
   }
 
   // S3
   const s3 = {
-    src: new window.PIXI.Sprite(s3Texture),
+    src: window.$helper.sprite(s3Texture, window.$10_point, window.$10_point),
+    endSrc: window.$helper.sprite(s3EndTexture, window.$10_point, window.$10_point),
+    ticker: new window.PIXI.Ticker(),
+    tickerEnd: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 150,
     speed: window.$1_point,
     range: window.$40_point,
-    endSrc: new window.PIXI.Sprite(s3EndTexture),
-    endSize: window.$20_point,
+    endSize: window.$10_point,
     endTime: 1
   }
 
-  s3.src.width = window.$10_point
-  s3.src.height = window.$10_point
-  s3.src.anchor.set(0.5)
-  s3.endSrc.width = window.$10_point
-  s3.endSrc.height = window.$10_point
-  s3.endSrc.anchor.set(0.5)
+  s3.ticker.add(delta => {
+    const speed = s3.speed * delta
+    s3.src[s3.currenDirect[0]] = s3.src[s3.currenDirect[0]] + s3.currenDirect[1] * speed
+    s3.src.rotation += 0.1
 
-  self.ctrl.s3 = () => {
+    s3.currentRange += speed
+    if (s3.currentRange >= s3.range) {
+      window.$pixi.stage.removeChild(s3.src)
+      s3.endSrc.x = s3.src.x
+      s3.endSrc.y = s3.src.y
+      s3.ticker.stop()
+      s3.tickerEnd.start()
+    }
+  })
+
+  s3.tickerEnd.add(delta => {
+    window.$pixi.stage.addChild(s3.endSrc)
+    if (!s3.isHit) {
+      for (let i in window.$players) {
+        if (i === config.id) continue
+        s3.isHit = window.$helper.isHit(s3.endSrc, window.$players[i].ball.ball)
+        if (config.isMe && s3.isHit) {
+          window.$command({
+            name: 'hp',
+            hp: -s3.atk,
+            id: i
+          })
+          break
+        }
+      }
+    }
+
+    s3.endSrc.width += 0.2 * window.$1_point * delta
+    s3.endSrc.height += 0.2 * window.$1_point * delta
+
+    if (s3.endSrc.width >= s3.endSize) {
+      setTimeout(() => {
+        window.$pixi.stage.removeChild(s3.endSrc)
+        s3.endSrc.width = window.$10_point
+        s3.endSrc.height = window.$10_point
+        s3.isEnabled = true
+        s3.tickerEnd.stop()
+      }, s3.endTime * 1000)
+    }
+  })
+
+  s3.ctrl = () => {
     if (config.isMe) {
       if (!s3.isEnabled) return
       if (self.isLockSkill) return
@@ -364,67 +408,20 @@ function Ball1(config = {}) {
       s3.isEnabled = false
     }
 
-    const currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, currenDirect, s3.src)
+    s3.currenDirect = [...self.direct]
+    const anchor = window.$helper.anchor(self.container, self.ball, s3.currenDirect, s3.src)
     s3.src.x = anchor.x
     s3.src.y = anchor.y
-    s3.src.angle = window.$helper.angleByDirect(currenDirect)
+    s3.src.angle = window.$helper.angleByDirect(s3.currenDirect)
     window.$pixi.stage.addChild(s3.src)
 
-    let count = 0
-    let isHit = false
-
-    requestAnimationFrame(function start() {
-      s3.src[currenDirect[0]] = s3.src[currenDirect[0]] + currenDirect[1] * s3.speed
-      s3.src.rotation += 0.1
-
-      count += s3.speed
-      if (count >= s3.range) {
-        window.$pixi.stage.removeChild(s3.src)
-        s3.endSrc.x = s3.src.x
-        s3.endSrc.y = s3.src.y
-        requestAnimationFrame(end)
-        return true
-      }
-
-      requestAnimationFrame(start)
-    })
-
-    function end() {
-      window.$pixi.stage.addChild(s3.endSrc)
-      if (!isHit) {
-        for (let i in window.$players) {
-          if (i === config.id) continue
-          isHit = window.$helper.isHit(s3.endSrc, window.$players[i].ball.ball)
-          if (config.isMe && isHit) {
-            window.$command({
-              name: 'hp',
-              hp: -s3.atk,
-              id: i
-            })
-            break
-          }
-        }
-      }
-
-      s3.endSrc.width += 0.5 * window.$1_point
-      s3.endSrc.height += 0.5 * window.$1_point
-
-      if (s3.endSrc.width >= s3.endSize) {
-        setTimeout(() => {
-          window.$pixi.stage.removeChild(s3.endSrc)
-          s3.endSrc.width = window.$10_point
-          s3.endSrc.height = window.$10_point
-          s3.isEnabled = true
-        }, s3.endTime * 1000)
-        return true
-      }
-      requestAnimationFrame(end)
-    }
+    s3.currentRange = 0
+    s3.isHit = false
+    s3.ticker.start()
   }
 
-  self.command.s3 = () => {
-    self.ctrl.s3()
+  self.ctrl.s3 = self.command.s3 = () => {
+    s3.ctrl()
   }
 
   // S4

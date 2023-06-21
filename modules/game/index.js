@@ -8,7 +8,10 @@ module.exports = app => {
     socket.join('CHANNEL')
     if (socket.auth.roomId) socket.join(socket.auth.roomId)
 
-    socket.on('COMMAND', data => {
+    socket.on('COMMAND', async data => {
+      if (data.name === 'gameOver') {
+        await Room.updateOne({ _id: socket.auth.roomId }, { $set: { status: 3 } })
+      }
       global.io.sockets.in(socket.auth.roomId).emit('COMMAND', data)
     })
 

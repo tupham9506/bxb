@@ -36,7 +36,6 @@
 
     window.onload = async () => {
       id = $helper.getCookie('id');
-
       if (id) {
         const res = await (await fetch('/api/user')).json();
         if (res.data) {

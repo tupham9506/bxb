@@ -1,4 +1,4 @@
-$helper = {
+window.$helper = {
   angleByDirect: direct => {
     if (direct[0] === 'x') {
       if (direct[1] === 1) return 90
@@ -91,5 +91,16 @@ $helper = {
   },
   getRandomFrom: (min, max) => {
     return Math.floor(Math.random() * (max - min) + min)
+  },
+  sprite: (texture, width, height, x, y, anchor) => {
+    const sprite = new window.PIXI.Sprite(texture)
+    sprite.width = width
+    sprite.height = height
+    if (x) sprite.x = x
+    if (y) sprite.y = y
+    anchor = anchor || 0.5
+    sprite.anchor.set(anchor)
+
+    return sprite
   }
 }
