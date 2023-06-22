@@ -17,7 +17,7 @@
     {
       "name": "Lá chắn Vibranium",
       "image": "components/balls/2/s2-icon.svg",
-      "description": "Giảm 80% sát thương nhận vào trong 5 giây."
+      "description": "Giảm 80% sát thương nhận vào trong 2 giây. Không thể di duyển trong thời gian hiệu lực."
     },
     {
       "name": "Nhát chém ân huệ [Bị động]",

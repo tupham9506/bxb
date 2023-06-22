@@ -2,92 +2,41 @@
   display: flex;
   padding: 0;
   margin: 0;
+  justify-content: center;
+  flex-direction: row;
+  position: relative;
+}
+
+bxb {
+  position: relative;
 }
 
 bxb canvas {
   display: block;
 }
 
-.side {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  justify-content: space-between;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.7)
-}
-
-.skill-container {
-  width: 100%;
-}
-
-.ultimate {
-  width: 50%;
-  border-radius: 50%;
-  border: 2px solid var(--color-red);
-  aspect-ratio: 1 / 1;
-  margin-left: auto;
+.vs-title {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
+  font-size: 40px;
+  line-height: 36px;
+  color: var(--color-blue);
 }
 
-.ultimate-skill {
-  z-index: 100;
-  width: 75%;
-  height: 75%;
-}
-
-.ultimate .skill {
-  position: absolute;
-  width: 30%;
-  height: 30%;
-  border-radius: 50%;
-  outline: 2px solid var(--color-gray);
-  padding: 5px;
-}
-
-.ultimate .skill-1 {
-  top: -30%;
-  right: 0%;
-}
-
-.ultimate .skill-2 {
-  top: -15%;
-  left: -20%;
-}
-
-.ultimate .skill-3 {
-  top: 70%;
-  left: -30%;
-}
-
-#bar-me .hp-bar-total {
+.hp-bar-container {
   position: absolute;
   top: 0;
-  bottom: 0;
   left: 0;
   right: 0;
-  border-radius: 50%;
-  z-index: 0;
-  opacity: 1;
-  background-color: var(--color-white);
-  overflow: hidden;
+  z-index: 100;
   display: flex;
-  justify-content: flex-end;
-  box-shadow: inset 0 0 1rem var(--color-red);
+  justify-content: center;
+  padding: 10px;
+  gap: 10px;
 }
 
-#bar-me .hp-bar-remain {
-  z-index: 1;
-  opacity: 1;
-  background-color: var(--color-red);
-  flex: 1;
-  margin-top: auto;
-}
-
-#bar-other {
+.hp-bar {
   width: 100%;
   height: 30px;
   margin-bottom: auto;
@@ -95,22 +44,33 @@ bxb canvas {
   border: 2px solid var(--color-red);
   box-shadow: inset 0 0 8px var(--color-red);
   border-radius: 2em;
+  position: relative;
+  color: var(--color-white);
 }
-#bar-other .hp-bar-remain {
+.hp-bar .hp-bar-remain {
   height: 100%;
   background-color: var(--color-red);
-  margin-left: auto;
-  text-align: right;
-  color: var(--color-white);
-  padding: 0 5px;
+  padding: 0 10px;
   border-radius: 2em;
+}
+
+.hp-bar .user-name {
+  position: absolute;
+  top: 0;
+  left: 10px;
   font-family: digital;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 26px;
 }
 
-.side .user-name {
+#bar-other .hp-bar-remain {
+  margin-left: auto;
   text-align: right;
+}
+
+#bar-other .user-name {
+  left: unset;
+  right: 10px;
 }
 
 .status-text {
@@ -126,4 +86,15 @@ bxb canvas {
 
 .status-text .win-text {
   color: var(--color-blue)
+}
+
+.setting {
+  min-width: 50px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.setting img {
+  height: 100%;
 }

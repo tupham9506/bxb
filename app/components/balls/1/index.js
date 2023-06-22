@@ -34,14 +34,14 @@ function Ball1(config = {}) {
   self.container.addChild(self.ball)
   self.text = null
   let currentMove = null
-  let currentMoveId = new window.PIXI.Ticker()
-  let timeout = null
+  let currentMoveTicker = new window.PIXI.Ticker()
+  let stopMoveTimeout = null
 
   // Control define
   self.ctrl.left = delta => {
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     if (self.isLockMove) return
-    const speed = timeout ? self.speed / 2 : self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
     self.container.x -= delta * speed
     self.direct = ['x', -1]
     window.$command({
@@ -55,7 +55,7 @@ function Ball1(config = {}) {
 
   self.ctrl.right = delta => {
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
-    const speed = timeout ? self.speed / 2 : self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
     self.container.x += delta * speed
     self.direct = ['x', +1]
     window.$command({
@@ -69,7 +69,7 @@ function Ball1(config = {}) {
 
   self.ctrl.up = delta => {
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
-    const speed = timeout ? self.speed / 2 : self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
     self.container.y -= delta * speed
     self.direct = ['y', -1]
     window.$command({
@@ -83,7 +83,7 @@ function Ball1(config = {}) {
 
   self.ctrl.down = delta => {
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
-    const speed = timeout ? self.speed / 2 : self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
     self.container.y += delta * speed
     self.direct = ['y', +1]
     window.$command({
@@ -95,26 +95,26 @@ function Ball1(config = {}) {
     })
   }
   self.ctrl.move = data => {
-    if (timeout) {
-      clearTimeout(timeout)
-      timeout = null
+    if (stopMoveTimeout) {
+      clearTimeout(stopMoveTimeout)
+      stopMoveTimeout = null
     }
 
     if (self.isLockMove) {
-      currentMoveId.remove(self.ctrl[currentMove])
+      currentMoveTicker.remove(self.ctrl[currentMove])
       currentMove = null
       return
     }
 
     if (data.key !== 'stop' && currentMove && data.key !== currentMove) {
-      currentMoveId.stop()
-      currentMoveId.remove(self.ctrl[currentMove])
+      currentMoveTicker.stop()
+      currentMoveTicker.remove(self.ctrl[currentMove])
     }
 
     if (data.key === 'stop') {
-      timeout = setTimeout(() => {
-        currentMoveId.stop()
-        currentMoveId.remove(self.ctrl[currentMove])
+      stopMoveTimeout = setTimeout(() => {
+        currentMoveTicker.stop()
+        currentMoveTicker.remove(self.ctrl[currentMove])
         currentMove = null
       }, 150)
 
@@ -123,9 +123,8 @@ function Ball1(config = {}) {
     if (currentMove === data.key) return
 
     currentMove = data.key
-    currentMoveId.add(self.ctrl[data.key])
-    console.log(currentMoveId)
-    currentMoveId.start()
+    currentMoveTicker.add(self.ctrl[data.key])
+    currentMoveTicker.start()
   }
 
   self.command.position = data => {
@@ -182,20 +181,9 @@ function Ball1(config = {}) {
   self.buildHp = () => {
     const hpSelector = document.querySelector(`[user-id="${config.id}"] .hp-bar-remain`)
     if (hpSelector) {
-      const size = config.isMe ? 'height' : 'width'
-      hpSelector.style[size] = (self.hp / self.hpTotal) * 100 + '%'
-      if (!config.isMe) {
-        hpSelector.innerHTML = self.hp
-      }
+      hpSelector.style.width = (self.hp / self.hpTotal) * 100 + '%'
+      // hpSelector.innerHTML = self.hp
     }
-  }
-
-  self.buildSkill = () => {
-    if (!config.isMe) return false
-    document.querySelector('.ultimate .skill-1').innerHTML = `<img src="${namespace}/s1-icon.svg">`
-    document.querySelector('.ultimate .skill-2').innerHTML = `<img src="${namespace}/s2-icon.svg">`
-    document.querySelector('.ultimate .skill-3').innerHTML = `<img src="${namespace}/s3-icon.svg">`
-    document.querySelector('.ultimate .ultimate-skill').innerHTML = `<img src="${namespace}/s4-icon.svg">`
   }
 
   // S1
@@ -225,13 +213,16 @@ function Ball1(config = {}) {
     }
 
     const speed = s1.speed * delta
-    s1.src[s1.direct[0]] = s1.src[s1.direct[0]] + s1.direct[1] * speed
+    s1.src[s1.currentDirect[0]] = s1.src[s1.currentDirect[0]] + s1.currentDirect[1] * speed
     s1.currentRange += speed
 
     if (s1.isHit || s1.currentRange >= window.$50_point) {
       window.$pixi.stage.removeChild(s1.src)
-      s1.ticker.stop()
-      if (s1.currentRange >= window.$50_point) s1.isEnabled = true
+
+      if (s1.currentRange >= window.$50_point) {
+        s1.isEnabled = true
+        s1.ticker.stop()
+      }
     }
   })
 
@@ -247,11 +238,11 @@ function Ball1(config = {}) {
       s1.isEnabled = false
     }
 
-    s1.direct = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s1.direct, s1.src)
+    s1.currentDirect = [...self.direct]
+    const anchor = window.$helper.anchor(self.container, self.ball, s1.currentDirect, s1.src)
     s1.src.x = anchor.x
     s1.src.y = anchor.y
-    s1.src.angle = window.$helper.angleByDirect(s1.direct)
+    s1.src.angle = window.$helper.angleByDirect(s1.currentDirect)
     window.$pixi.stage.addChild(s1.src)
 
     s1.currentRange = 0
@@ -304,7 +295,10 @@ function Ball1(config = {}) {
     s2.currentRange += speed
     if (s2.isHit || s2.currentRange >= s2.range) {
       window.$pixi.stage.removeChild(s2.src)
-      if (s2.currentRange >= window.$50_point) s2.isEnabled = true
+      if (s2.currentRange >= window.$50_point) {
+        s2.isEnabled = true
+        s2.ticker.stop()
+      }
     }
   })
 
@@ -346,7 +340,7 @@ function Ball1(config = {}) {
     atk: 150,
     speed: window.$1_point,
     range: window.$40_point,
-    endSize: window.$10_point,
+    endSize: window.$20_point,
     endTime: 1
   }
 
@@ -382,16 +376,16 @@ function Ball1(config = {}) {
       }
     }
 
-    s3.endSrc.width += 0.2 * window.$1_point * delta
-    s3.endSrc.height += 0.2 * window.$1_point * delta
+    s3.endSrc.width += window.$1_point * delta
+    s3.endSrc.height += window.$1_point * delta
 
     if (s3.endSrc.width >= s3.endSize) {
+      s3.tickerEnd.stop()
       setTimeout(() => {
         window.$pixi.stage.removeChild(s3.endSrc)
         s3.endSrc.width = window.$10_point
         s3.endSrc.height = window.$10_point
         s3.isEnabled = true
-        s3.tickerEnd.stop()
       }, s3.endTime * 1000)
     }
   })
@@ -426,17 +420,40 @@ function Ball1(config = {}) {
 
   // S4
   const s4 = {
-    src: new window.PIXI.Sprite(s4Texture),
+    src: window.$helper.sprite(s4Texture, window.$30_point, window.$30_point),
+    ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 400,
     speed: window.$2_point
   }
 
-  s4.src.width = window.$40_point
-  s4.src.height = window.$40_point
-  s4.src.anchor.set(0.5)
+  s4.ticker.add(delta => {
+    if (!s4.isHit) {
+      for (let i in window.$players) {
+        if (i === config.id) continue
+        s4.isHit = window.$helper.isHit(s4.src, window.$players[i].ball.ball)
+        if (config.isMe && s4.isHit) {
+          window.$command({
+            name: 'hp',
+            hp: -s4.atk,
+            id: i
+          })
+          break
+        }
+      }
+    }
+    const speed = s4.speed * delta
+    s4.src[s4.currenDirect[0]] = s4.src[s4.currenDirect[0]] + s4.currenDirect[1] * speed
+    s4.currentRange += speed
+    if (s4.isHit || s4.currentRange >= 2 * window.$100_point) {
+      window.$pixi.stage.removeChild(s4.src)
+      if (s4.currentRange >= window.$100_point) {
+        s4.ticker.stop()
+      }
+    }
+  })
 
-  self.ctrl.s4 = () => {
+  s4.ctrl = () => {
     if (config.isMe) {
       if (!s4.isEnabled) return
       if (self.isLockSkill) return
@@ -447,53 +464,21 @@ function Ball1(config = {}) {
       })
       s4.isEnabled = false
     }
-    document.querySelector('.ultimate-skill').innerHTML = ''
 
-    const currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, currenDirect, s4.src)
+    s4.currenDirect = [...self.direct]
+    const anchor = window.$helper.anchor(self.container, self.ball, s4.currenDirect, s4.src)
     s4.src.x = anchor.x
     s4.src.y = anchor.y
-    s4.src.angle = window.$helper.angleByDirect(currenDirect)
+    s4.src.angle = window.$helper.angleByDirect(s4.currenDirect)
     window.$pixi.stage.addChild(s4.src)
-    window.$pixi.renderer.backgroundColor = '#3f3f3f'
-    let count = 0
-    let isHit = false
-
-    requestAnimationFrame(function start() {
-      if (!isHit) {
-        for (let i in window.$players) {
-          if (i === config.id) continue
-          isHit = window.$helper.isHit(s4.src, window.$players[i].ball.ball)
-          if (config.isMe && isHit) {
-            window.$command({
-              name: 'hp',
-              hp: -s4.atk,
-              id: i
-            })
-            break
-          }
-        }
-      }
-
-      s4.src[currenDirect[0]] = s4.src[currenDirect[0]] + currenDirect[1] * s4.speed
-      count += s4.speed
-      if (isHit || count >= 2 * window.$100_point) {
-        window.$pixi.stage.removeChild(s4.src)
-        if (count >= window.$100_point) {
-          s4.isEnabled = true
-          window.$pixi.renderer.backgroundColor = '#FFFFFF'
-          return true
-        }
-      }
-
-      requestAnimationFrame(start)
-    })
+    s4.currentRange = 0
+    s4.isHit = false
+    s4.ticker.start()
   }
 
-  self.command.s4 = () => {
-    self.ctrl.s4()
+  self.command.s4 = self.ctrl.s4 = () => {
+    s4.ctrl()
   }
 
   self.buildHp()
-  self.buildSkill()
 }

@@ -36,6 +36,7 @@ window.onSetup = () => {
   window.socket.on('CREATE_ROOM', () => {
     window.location.href = '/select'
   })
+  document.querySelector('.loading-bg').remove()
 }
 
 window.joinRoom = id => {

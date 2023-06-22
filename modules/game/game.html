@@ -10,23 +10,22 @@
   <link rel="stylesheet" href="assets/styles/game.css">
 </head>
 <body>
+  <div class="loading-bg"></div>
   <div id="main">
-    <bxb></bxb>
-    <div class="side">
-      <div class="user-name"></div>
-      <div class="hp-bar" id="bar-other">
-        <div class="hp-bar-remain"></div>
-      </div>
-      <div class="skill-container">
-        <div class="ultimate" id="bar-me">
-          <div class="skill skill-1"></div>
-          <div class="skill skill-2"></div>
-          <div class="skill skill-3"></div>
-          <div class="ultimate-skill"></div>
-          <div class="hp-bar-total"><div class="hp-bar-remain"></div></div>
+    <bxb>
+      <div class="hp-bar-container">
+        <div class="hp-bar" id="bar-key">
+          <div class="hp-bar-remain"></div>
+          <div class="user-name"></div>
+        </div>
+        <div class="vs-title" >VS</div>
+        <div class="hp-bar" id="bar-other">
+          <div class="hp-bar-remain"></div>
+          <div class="user-name"></div>
         </div>
       </div>
-    </div>
+    </bxb>
+    <button type="button" class="btn setting" onclick="openDialog('Menu')"><img src="assets/images/cog.svg"></button>
     <div id="dialog"></div>
   </div>
   <script src="libs/socket.io/socket.io.min.js"></script>

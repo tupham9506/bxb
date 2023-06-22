@@ -26,16 +26,14 @@
 .ball-table {
   flex: 1;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   flex-direction: column;
   padding: 10px;
-  margin-top: 60px;
-  margin-bottom: 10px;
 }
 
 .ball-container {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -263,25 +261,42 @@
   border: 1px solid #025f62;
 }
 
+.guide-dialog {
+  display: none;
+}
+.guide-dialog .dialog-content {
+  padding: 20px;
+}
+
 .control-guide {
   display: flex;
-  font-size: 20px;
+  font-size: 25px;
   flex-direction: column;
   margin-top: auto;
-  gap: 10px;
+  gap: 20px;
 }
 
 .control-guide-line {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 5px;
+  gap: 50px;
+  justify-content: center;
+}
+
+.control-guide-line.title {
+  font-size: 40px;
+}
+
+.control-guide-line.close-button {
+  margin-top: 50px;
 }
 
 .guide-line-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
+  margin-bottom: 5px;
 }
 
 .control-guide-header {

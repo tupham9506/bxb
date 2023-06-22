@@ -64,7 +64,7 @@ window.$helper = {
     const element1Bound = element1.getBounds()
     const element2Bound = element2.getBounds()
 
-    return Intersects.boxBox(
+    return window.Intersects.boxBox(
       element1Bound.x,
       element1Bound.y,
       element1Bound.width,
@@ -76,7 +76,6 @@ window.$helper = {
     )
   },
   setCookie: (name, value) => {
-    var expires = ''
     document.cookie = name + '=' + (value || '') + '; path=/'
   },
   getCookie: name => {

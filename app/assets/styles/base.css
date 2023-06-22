@@ -59,6 +59,8 @@ html, body {
   line-height: 22px;
   background: url('/assets/images/home-bg.jpg');
   background-size: cover;
+  background-position: center;
+  background-size: cover;
   overflow: auto;
 }
 
@@ -209,6 +211,10 @@ input:focus-visible {
   align-items: center;
 }
 
+.dialog .dialog-close {
+  position: absolute;
+}
+
 .dialog .dialog-content {
   width: 30%;
   display: flex;
@@ -216,6 +222,20 @@ input:focus-visible {
   justify-content: space-between;
   padding: 10px;
   gap: 20px;
+  position: relative;
+  z-index: 1000;
+}
+
+.dialog.lg .dialog-content {
+  width: 60%;
+}
+
+.dialog .dialog-close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .dialog .dialog-header {
@@ -223,3 +243,24 @@ input:focus-visible {
   text-align: center;
 }
 
+.loading-bg {
+  background-color: #001930;
+  background-image: url('/assets/images/home-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: var(--color-white);
+  z-index: 9999;
+  font-size: 50px;
+}
+
+.loading-bg::after {
+  content: 'Loading';
+}

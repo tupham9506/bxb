@@ -19,40 +19,40 @@ window.onSetup = () => {
         const statusText =
           data.id === window.id ? '<div class="lose-text">You lose!</div>' : '<div class="win-text">You win</div>'
         window.$helper.setCookie('players', '')
-        document.querySelector('#dialog').innerHTML = `
-        <div class="dialog">
-        <div class="dialog-content card">
-          <div class="status-text">${statusText}</div>
-          <button type="button" class="btn full" onclick="$goRoomPage()">Về phòng chờ</button>
-        </div>
-      </div>
-      `
+        window.openDialog(statusText)
         window.isGameOver = true
         return false
       }
       window.$players[data.id].ball.command[data.name](data)
     })
   })
+
+  setTimeout(() => {
+    document.querySelector('.loading-bg').remove()
+  }, 1000)
 }
 
 window.buildGame = () => {
   window.isGameBuilt = true
+  window.$width = window.innerHeight * 1.8
+  window.$height = window.innerHeight
   window.$pixi = new window.PIXI.Application({
-    width: innerHeight * 1.6,
-    height: innerHeight,
-    background: '#FFFFFF',
+    width: window.$width,
+    height: window.$height,
+    background: '#DBDEE1',
     antialias: true,
     transparent: false,
     resolution: 1
   })
 
-  const backgroundTexture = window.PIXI.Texture.from('assets/images/game-bg.avif')
-  let background = new window.PIXI.Sprite(backgroundTexture)
-  background.x = 0
-  background.y = 0
-  background.width = window.innerWidth
-  background.height = window.innerHeight
-  window.$pixi.stage.addChild(background)
+  // const backgroundTexture = window.PIXI.Texture.from('assets/images/home-bg.jpg')
+  // let background = new window.PIXI.Sprite(backgroundTexture)
+  // background.x = 0
+  // background.y = 0
+  // background.alpha = 0.05
+  // background.width = window.innerWidth
+  // background.height = window.innerHeight
+  // window.$pixi.stage.addChild(background)
 
   document.querySelector('bxb').appendChild(window.$pixi.view)
 
@@ -76,11 +76,12 @@ window.buildGame = () => {
 
   for (let i in window.$players) {
     const isMe = window.id === i
-    if (isMe) {
-      document.querySelector('#bar-me').setAttribute('user-id', i)
+    if (window.$players[i].isKey) {
+      document.querySelector('#bar-key').setAttribute('user-id', i)
+      document.querySelector('#bar-key .user-name').innerHTML = window.$players[i].userName
     } else {
       document.querySelector('#bar-other').setAttribute('user-id', i)
-      document.querySelector('.side .user-name').innerHTML = window.$players[i].userName
+      document.querySelector('#bar-other .user-name').innerHTML = window.$players[i].userName
     }
 
     window.$players[i].ball = new window[`Ball${window.$players[i].ballId}`]({
@@ -166,11 +167,31 @@ window.$command = data => {
   window.socket.emit('COMMAND', data)
 }
 
-window.$goSelectPage = () => {
-  window.location.href = '/select'
+window.$goRoomPage = () => {
+  window.location.href = '/room'
 }
 
-window.$goRoomPage = () => {
-  window.$helper.setCookie('roomId', '')
-  window.location.href = '/room'
+window.onbeforeunload = function () {
+  window.$command({
+    name: 'gameOver',
+    id: window.id
+  })
+
+  return 'Are you sure want to LOGOUT the session ?'
+}
+
+window.openDialog = title => {
+  document.querySelector('#dialog').innerHTML = `
+  <div class="dialog">
+    <div class="dialog-content card">
+      <div class="dialog-close" onclick="closeDialog()">X</div>
+      <div class="status-text">${title}</div>
+      <button type="button" class="btn full" onclick="$goRoomPage()">Về phòng chờ</button>
+    </div>
+  </div>
+`
+}
+
+window.closeDialog = () => {
+  document.querySelector('#dialog').innerHTML = ''
 }

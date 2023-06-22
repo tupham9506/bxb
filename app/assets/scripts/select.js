@@ -35,13 +35,13 @@ window.onSetup = () => {
 
         if (player.isKey) {
           document.querySelector('.guide').innerHTML =
-            '* Lựa chọn nhân vật bóng, chờ đối thủ sẵn sàng và ấn nút "Bắt đầu" trận đấu.'
+            'Lựa chọn nhân vật bóng, chờ đối thủ sẵn sàng và ấn nút "Bắt đầu" trận đấu.'
           if (player.id === window.id) {
             document.querySelector('.ready-button').innerHTML = 'Bắt đầu'
           }
         } else {
           document.querySelector('.guide').innerHTML =
-            '* Lựa chọn nhân vật bóng sau đó bấm vào nút "Sẵn sàng". Chờ đợi chủ phòng bắt đầu trận đấu.'
+            'Lựa chọn nhân vật bóng sau đó bấm vào nút "Sẵn sàng". Chờ đợi chủ phòng bắt đầu trận đấu.'
         }
 
         if (window.id !== window.room.userId) {
@@ -59,6 +59,13 @@ window.onSetup = () => {
         if (player.ballId) buildSelectBall(player.id, player.ballId)
       }
     })
+
+    if (!window.$helper.getCookie('isReadGuide')) {
+      document.querySelector('.guide-dialog').style.display = 'flex'
+      window.$helper.setCookie('isReadGuide', 1)
+    }
+
+    document.querySelector('.loading-bg').remove()
   })
 
   window.socket.on('READY', () => {
@@ -173,6 +180,10 @@ window.buildSkillDesciption = (ballId, self) => {
 
 function getIndexPercent(type, value) {
   return (value * 100) / 10
+}
+
+window.closeGuide = () => {
+  document.querySelector('.guide-dialog').style.display = 'none'
 }
 
 window.startGame = () => {

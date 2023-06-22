@@ -41,12 +41,14 @@ function Ball2(config = {}) {
   self.container.addChild(self.weapon)
   self.text = null
   let currentMove = null
-  let currentMoveId = null
+  let currentMoveTicker = new window.PIXI.Ticker()
+  let stopMoveTimeout = null
 
   // Control define
-  self.ctrl.left = () => {
+  self.ctrl.left = delta => {
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
-    self.container.x -= self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
+    self.container.x -= delta * speed
     self.direct = ['x', -1]
     window.$command({
       id: config.id,
@@ -55,12 +57,12 @@ function Ball2(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.left)
   }
 
-  self.ctrl.right = () => {
+  self.ctrl.right = delta => {
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
-    self.container.x += self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
+    self.container.x += delta * speed
     self.direct = ['x', +1]
     window.$command({
       id: config.id,
@@ -69,12 +71,12 @@ function Ball2(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.right)
   }
 
-  self.ctrl.up = () => {
+  self.ctrl.up = delta => {
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
-    self.container.y -= self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
+    self.container.y -= delta * speed
     self.direct = ['y', -1]
     window.$command({
       id: config.id,
@@ -83,12 +85,12 @@ function Ball2(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.up)
   }
 
-  self.ctrl.down = () => {
+  self.ctrl.down = delta => {
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
-    self.container.y += self.speed
+    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
+    self.container.y += delta * speed
     self.direct = ['y', +1]
     window.$command({
       id: config.id,
@@ -97,31 +99,42 @@ function Ball2(config = {}) {
       y: self.container.y / window.$point,
       direct: self.direct
     })
-    currentMoveId = requestAnimationFrame(self.ctrl.down)
   }
 
   self.ctrl.move = data => {
+    if (stopMoveTimeout) {
+      clearTimeout(stopMoveTimeout)
+      stopMoveTimeout = null
+    }
+
     if (self.isLockMove) {
+      currentMoveTicker.remove(self.ctrl[currentMove])
+      currentMoveTicker.stop()
       currentMove = null
-      cancelAnimationFrame(currentMoveId)
       return
     }
 
     if (!self.isAtk) {
       self.buildWeaponPosition()
     }
-    if (currentMove && data.key !== currentMove) {
-      cancelAnimationFrame(currentMoveId)
+    if (data.key !== 'stop' && currentMove && data.key !== currentMove) {
+      currentMoveTicker.stop()
+      currentMoveTicker.remove(self.ctrl[currentMove])
     }
     if (data.key === 'stop') {
-      currentMove = null
-      cancelAnimationFrame(currentMoveId)
+      stopMoveTimeout = setTimeout(() => {
+        currentMoveTicker.stop()
+        currentMoveTicker.remove(self.ctrl[currentMove])
+        currentMove = null
+      }, 150)
+
       return
     }
     if (currentMove === data.key) return
 
     currentMove = data.key
-    currentMoveId = requestAnimationFrame(self.ctrl[data.key])
+    currentMoveTicker.add(self.ctrl[data.key])
+    currentMoveTicker.start()
   }
 
   self.command.position = data => {
@@ -193,24 +206,14 @@ function Ball2(config = {}) {
   self.buildHp = () => {
     const hpSelector = document.querySelector(`[user-id="${config.id}"] .hp-bar-remain`)
     if (hpSelector) {
-      const size = config.isMe ? 'height' : 'width'
-      hpSelector.style[size] = (self.hp / self.hpTotal) * 100 + '%'
-      if (!config.isMe) {
-        hpSelector.innerHTML = self.hp
-      }
+      hpSelector.style.width = (self.hp / self.hpTotal) * 100 + '%'
+      // hpSelector.innerHTML = self.hp
     }
-  }
-
-  self.buildSkill = () => {
-    if (!config.isMe) return false
-    document.querySelector('.ultimate .skill-1').innerHTML = `<img src="${namespace}/s1-icon.svg">`
-    document.querySelector('.ultimate .skill-2').innerHTML = `<img src="${namespace}/s2-icon.svg">`
-    document.querySelector('.ultimate .skill-3').innerHTML = `<img src="${namespace}/s3-icon.svg">`
-    document.querySelector('.ultimate .ultimate-skill').innerHTML = `<img src="${namespace}/s4-icon.svg">`
   }
 
   // S1
   const s1 = {
+    ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 100,
     speed: 7,
@@ -218,7 +221,42 @@ function Ball2(config = {}) {
     endTime: 500
   }
 
-  self.ctrl.s1 = () => {
+  s1.ticker.add(delta => {
+    if (config.isMe && !s1.isHit) {
+      for (let i in window.$players) {
+        if (i === config.id) continue
+        s1.isHit = window.$helper.isHit(self.weapon, window.$players[i].ball.ball)
+
+        if (config.isMe && s1.isHit) {
+          window.$command({
+            name: 'hp',
+            hp: -(s1.atk + s1.crit),
+            isCrit: s1.isCrit,
+            id: i
+          })
+          break
+        }
+      }
+    }
+
+    const speed = s1.speed * delta + s4.currentRange / 10
+    self.weapon.angle += s1.currenDirect[1] * speed
+    s4.currentRange += speed
+
+    if (s4.currentRange >= s1.angle) {
+      setTimeout(() => {
+        s1.isEnabled = true
+        self.isAtk = false
+        self.buildWeaponPosition()
+        if (s1.isCrit && !s4.isRun) {
+          self.weapon.texture = weaponTexture
+        }
+      }, s1.endTime)
+      s1.ticker.stop()
+    }
+  })
+
+  s1.ctrl = () => {
     if (config.isMe) {
       if (!s1.isEnabled) return
       if (self.isLockSkill) return
@@ -231,61 +269,25 @@ function Ball2(config = {}) {
       self.isAtk = true
     }
 
-    let count = 0
-    let isHit = false
-    const crit = window.$helper.getRandomFrom(s3.critMin, s3.critMax)
-    const isCrit = crit > s3.critMax / 2
-
-    const currenDirect = [...self.direct]
-
-    requestAnimationFrame(function start() {
-      if (config.isMe && !isHit) {
-        for (let i in window.$players) {
-          if (i === config.id) continue
-          isHit = window.$helper.isHit(self.weapon, window.$players[i].ball.ball)
-
-          if (config.isMe && isHit) {
-            window.$command({
-              name: 'hp',
-              hp: -(s1.atk + crit),
-              isCrit: isCrit,
-              id: i
-            })
-            break
-          }
-        }
-      }
-
-      self.weapon.angle += currenDirect[1] * s1.speed
-      count += s1.speed
-
-      if (count >= s1.angle) {
-        setTimeout(() => {
-          s1.isEnabled = true
-          self.isAtk = false
-          self.buildWeaponPosition()
-          if (isCrit && !s4.isRun) {
-            self.weapon.texture = weaponTexture
-          }
-        }, s1.endTime)
-
-        return true
-      }
-
-      requestAnimationFrame(start)
-    })
+    s4.currentRange = 0
+    s1.isHit = false
+    s1.crit = window.$helper.getRandomFrom(s3.critMin, s3.critMax)
+    s1.isCrit = s1.crit > s3.critMax / 2
+    s1.currenDirect = [...self.direct]
+    s1.ticker.start()
   }
 
-  self.command.s1 = () => {
-    self.ctrl.s1()
+  self.command.s1 = self.ctrl.s1 = () => {
+    s1.ctrl()
   }
 
   // S2
   const s2 = {
     isEnabled: true,
     defPercent: 80,
-    time: 2000,
-    isRun: false
+    time: 1000,
+    isRun: false,
+    delay: 2000
   }
 
   self.ctrl.s2 = () => {
@@ -297,6 +299,7 @@ function Ball2(config = {}) {
         id: window.id,
         name: 's2'
       })
+      if (currentMoveTicker) currentMoveTicker.stop()
       self.isLockMove = true
     }
     s2.isRun = true
@@ -306,9 +309,12 @@ function Ball2(config = {}) {
     setTimeout(() => {
       self.ball.texture = ballTexture
       self.isLockMove = false
-      s2.isEnabled = true
       s2.isRun = false
     }, s2.time)
+
+    setTimeout(() => {
+      s2.isEnabled = true
+    }, s2.delay)
   }
 
   self.command.s2 = () => {
@@ -351,7 +357,6 @@ function Ball2(config = {}) {
       s4.isEnabled = false
       s2.isEnabled = false
     }
-    document.querySelector('.ultimate-skill').innerHTML = ''
     s4.isRun = true
     const weaponWidthOrg = self.weapon.width
     const weaponHeightOrg = self.weapon.height
@@ -388,5 +393,4 @@ function Ball2(config = {}) {
 
   self.buildWeaponPosition()
   self.buildHp()
-  self.buildSkill()
 }

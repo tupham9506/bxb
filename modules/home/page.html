@@ -11,13 +11,11 @@
   <link rel="stylesheet" href="assets/styles/index.css">
 </head>
 <body>
+  <div class="loading-bg"></div>
   <div class="flex flex-column flex-center-x h-100 relative">
     <div class="header">
       <div class="title">Ball x balL</div>
     </div>
-    <!-- <div class="flex flex-center">
-      <img class="logo animate__animated animate__bounceInDown" src="assets/images/maze-cornea.svg" alt=""/>
-    </div> -->
     <div class="menu">
       <input type="text" class="input text-center" placeholder="Nhập tên của Khứa" id="userName">
       <a href="#" class="btn red" href="" onclick="start(); return false;">Bắt đầu</a>
@@ -29,6 +27,7 @@
       <a href="https://github.com/tupham9506/bxb" target="_blank" class="github"></a>
     </div>
   </div>
+  
   <script src="assets/scripts/helper.js"></script>
   <script>
     var id;
@@ -42,6 +41,7 @@
           document.querySelector('#userName').value = res.data.userName;
         }
       }
+      document.querySelector('.loading-bg').remove()
     }
 
     async function start () {

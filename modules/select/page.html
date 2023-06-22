@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/styles/select.css">
 </head>
 <body>
+  <div class="loading-bg"></div>
   <div id="main">
     <div id="player1">
       <div class="header">
@@ -23,22 +24,8 @@
     </div>
     <div id="ball">
       <div></div>
-      <!-- <div class="header-title">VS</div> -->
-      <div class="card ball-table">
+      <div class="ball-table">
         <div class="ball-container"></div>
-        <div class="control-guide">
-          <div class="control-guide-line"><div class="guide"></div></div>
-          <div class="control-guide-line">
-            <div class="guide-line-item"><div class="control-button">A</div></div>
-            <div class="guide-line-item"><div class="control-button">D</div></div>
-            <div class="guide-line-item"><div class="control-button">W</div></div>
-            <div class="guide-line-item"><div class="control-button">S</div></div>
-            <div class="guide-line-item"><div class="control-button">J</div></div>
-            <div class="guide-line-item"><div class="control-button">K</div></div>
-            <div class="guide-line-item"><div class="control-button">L</div></div>
-            <div class="guide-line-item"><div class="control-button">O</div></div>
-          </div>
-        </div>
       </div>
       <div class="text-center">
         <button type="button" class="btn red ready-button" onclick="startGame()">Sẵn sàng</button>
@@ -51,6 +38,37 @@
       <div class="selected-ball-container"></div>
       <div class="ready-status text-center"></div>
     </div>
+  </div>
+  <div class="dialog lg guide-dialog">
+    <div class="dialog-content card">
+      <div class="control-guide">
+        <div class="control-guide-line title">Hướng Dẫn</div>
+        <div class="control-guide-line">
+          <div>
+            <div class="guide"></div>
+            <div>Vui lòng tắt Unikey và chế độ nguồn điện thấp nếu bạn dùng laptop.</div>
+          </div>
+        </div>
+        <div class="control-guide-line">
+          <div>
+            <div class="guide-line-item"><div class="control-button">A</div>Di chuyển sang trái</div>
+            <div class="guide-line-item"><div class="control-button">D</div>Di chuyển sang phải</div>
+            <div class="guide-line-item"><div class="control-button">W</div>Di chuyển lên trên</div>
+            <div class="guide-line-item"><div class="control-button">S</div>Di chuyển xuống dưới</div>
+          </div>
+          <div>
+            <div class="guide-line-item"><div class="control-button">J</div>Dùng skill 1</div>
+            <div class="guide-line-item"><div class="control-button">K</div>Dùng skill 2</div>
+            <div class="guide-line-item"><div class="control-button">L</div>Dùng skill 3</div>
+            <div class="guide-line-item"><div class="control-button">O</div>Dùng skill 4</div>
+          </div>
+        </div>
+        <div class="control-guide-line close-button">
+          <button type="button" class="btn" onclick="closeGuide()">Đóng</button>
+        </div>
+      </div>
+    </div>
+    
   </div>
   <script src="libs/socket.io/socket.io.min.js"></script>
   <script src="assets/scripts/helper.js"></script>
