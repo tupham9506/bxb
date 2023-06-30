@@ -33,16 +33,19 @@ function Ball1(config = {}) {
 
   self.container.addChild(self.ball)
   self.text = null
-  let currentMove = null
-  let currentMoveTicker = new window.PIXI.Ticker()
-  let stopMoveTimeout = null
+  let currentKey = null
+  let move = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  }
 
   // Control define
   self.ctrl.left = delta => {
+    if (self.isLockMove || currentKey !== 'left') return
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
-    if (self.isLockMove) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.x -= delta * speed
+    self.container.x -= delta * self.speed
     self.direct = ['x', -1]
     window.$command({
       id: config.id,
@@ -54,9 +57,9 @@ function Ball1(config = {}) {
   }
 
   self.ctrl.right = delta => {
+    if (self.isLockMove || currentKey !== 'right') return
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.x += delta * speed
+    self.container.x += delta * self.speed
     self.direct = ['x', +1]
     window.$command({
       id: config.id,
@@ -68,9 +71,9 @@ function Ball1(config = {}) {
   }
 
   self.ctrl.up = delta => {
+    if (self.isLockMove || currentKey !== 'up') return
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.y -= delta * speed
+    self.container.y -= delta * self.speed
     self.direct = ['y', -1]
     window.$command({
       id: config.id,
@@ -82,9 +85,9 @@ function Ball1(config = {}) {
   }
 
   self.ctrl.down = delta => {
+    if (self.isLockMove || currentKey !== 'down') return
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.y += delta * speed
+    self.container.y += delta * self.speed
     self.direct = ['y', +1]
     window.$command({
       id: config.id,
@@ -94,37 +97,38 @@ function Ball1(config = {}) {
       direct: self.direct
     })
   }
+
+  let moveTicker = {
+    up: new window.PIXI.Ticker().add(self.ctrl.up),
+    down: new window.PIXI.Ticker().add(self.ctrl.down),
+    left: new window.PIXI.Ticker().add(self.ctrl.left),
+    right: new window.PIXI.Ticker().add(self.ctrl.right)
+  }
+
   self.ctrl.move = data => {
-    if (stopMoveTimeout) {
-      clearTimeout(stopMoveTimeout)
-      stopMoveTimeout = null
-    }
-
     if (self.isLockMove) {
-      currentMoveTicker.remove(self.ctrl[currentMove])
-      currentMove = null
+      for (let i in move) {
+        if (move[i]) {
+          moveTicker[i].stop()
+          move[i] = false
+        }
+      }
+      return false
+    }
+
+    if (data.name === 'stop') {
+      if (move[data.key]) {
+        moveTicker[data.key].stop()
+        move[data.key] = false
+      }
       return
     }
 
-    if (data.key !== 'stop' && currentMove && data.key !== currentMove) {
-      currentMoveTicker.stop()
-      currentMoveTicker.remove(self.ctrl[currentMove])
-    }
+    if (move[data.key]) return
 
-    if (data.key === 'stop') {
-      stopMoveTimeout = setTimeout(() => {
-        currentMoveTicker.stop()
-        currentMoveTicker.remove(self.ctrl[currentMove])
-        currentMove = null
-      }, 150)
-
-      return
-    }
-    if (currentMove === data.key) return
-
-    currentMove = data.key
-    currentMoveTicker.add(self.ctrl[data.key])
-    currentMoveTicker.start()
+    currentKey = data.key
+    move[data.key] = true
+    moveTicker[data.key].start()
   }
 
   self.command.position = data => {
@@ -192,7 +196,8 @@ function Ball1(config = {}) {
     ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 100,
-    speed: window.$1_point
+    speed: window.$1_point,
+    sound: window.$helper.sound(`${namespace}s1.mp3`)
   }
 
   s1.ticker.add(delta => {
@@ -218,7 +223,7 @@ function Ball1(config = {}) {
 
     if (s1.isHit || s1.currentRange >= window.$50_point) {
       window.$pixi.stage.removeChild(s1.src)
-
+      s1.sound.stop()
       if (s1.currentRange >= window.$50_point) {
         s1.isEnabled = true
         s1.ticker.stop()
@@ -237,6 +242,7 @@ function Ball1(config = {}) {
       })
       s1.isEnabled = false
     }
+    s1.sound.play()
 
     s1.currentDirect = [...self.direct]
     const anchor = window.$helper.anchor(self.container, self.ball, s1.currentDirect, s1.src)
@@ -262,7 +268,8 @@ function Ball1(config = {}) {
     atk: 50,
     speed: window.$1_point,
     range: window.$100_point,
-    effectTime: 2000
+    effectTime: 2000,
+    sound: window.$helper.sound(`${namespace}s2.mp3`)
   }
 
   s2.ticker.add(delta => {
@@ -295,6 +302,7 @@ function Ball1(config = {}) {
     s2.currentRange += speed
     if (s2.isHit || s2.currentRange >= s2.range) {
       window.$pixi.stage.removeChild(s2.src)
+      s2.sound.stop()
       if (s2.currentRange >= window.$50_point) {
         s2.isEnabled = true
         s2.ticker.stop()
@@ -313,6 +321,8 @@ function Ball1(config = {}) {
       })
       s2.isEnabled = false
     }
+
+    s2.sound.play()
 
     s2.currenDirect = [...self.direct]
     const anchor = window.$helper.anchor(self.container, self.ball, s2.currenDirect, s2.src)
@@ -341,7 +351,8 @@ function Ball1(config = {}) {
     speed: window.$1_point,
     range: window.$40_point,
     endSize: window.$20_point,
-    endTime: 1
+    endTime: 1,
+    sound: window.$helper.sound(`${namespace}s3-end.mp3`)
   }
 
   s3.ticker.add(delta => {
@@ -356,6 +367,7 @@ function Ball1(config = {}) {
       s3.endSrc.y = s3.src.y
       s3.ticker.stop()
       s3.tickerEnd.start()
+      s3.sound.play()
     }
   })
 
@@ -381,6 +393,7 @@ function Ball1(config = {}) {
 
     if (s3.endSrc.width >= s3.endSize) {
       s3.tickerEnd.stop()
+
       setTimeout(() => {
         window.$pixi.stage.removeChild(s3.endSrc)
         s3.endSrc.width = window.$10_point
@@ -424,7 +437,8 @@ function Ball1(config = {}) {
     ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 400,
-    speed: window.$2_point
+    speed: window.$2_point,
+    sound: window.$helper.sound(`${namespace}s4.mp3`)
   }
 
   s4.ticker.add(delta => {
@@ -464,6 +478,8 @@ function Ball1(config = {}) {
       })
       s4.isEnabled = false
     }
+
+    s4.sound.play()
 
     s4.currenDirect = [...self.direct]
     const anchor = window.$helper.anchor(self.container, self.ball, s4.currenDirect, s4.src)

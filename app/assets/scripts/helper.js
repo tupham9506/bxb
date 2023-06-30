@@ -101,5 +101,11 @@ window.$helper = {
     sprite.anchor.set(anchor)
 
     return sprite
+  },
+  sound: url => {
+    return window.PIXI.sound.Sound.from({
+      url: url,
+      preload: true
+    })
   }
 }

@@ -40,15 +40,19 @@ function Ball2(config = {}) {
   self.container.addChild(self.ball)
   self.container.addChild(self.weapon)
   self.text = null
-  let currentMove = null
-  let currentMoveTicker = new window.PIXI.Ticker()
-  let stopMoveTimeout = null
+  let currentKey = null
+  let move = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  }
 
   // Control define
   self.ctrl.left = delta => {
+    if (self.isLockMove || currentKey !== 'left') return
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.x -= delta * speed
+    self.container.x -= delta * self.speed
     self.direct = ['x', -1]
     window.$command({
       id: config.id,
@@ -60,9 +64,9 @@ function Ball2(config = {}) {
   }
 
   self.ctrl.right = delta => {
+    if (self.isLockMove || currentKey !== 'right') return
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.x += delta * speed
+    self.container.x += delta * self.speed
     self.direct = ['x', +1]
     window.$command({
       id: config.id,
@@ -74,9 +78,9 @@ function Ball2(config = {}) {
   }
 
   self.ctrl.up = delta => {
+    if (self.isLockMove || currentKey !== 'up') return
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.y -= delta * speed
+    self.container.y -= delta * self.speed
     self.direct = ['y', -1]
     window.$command({
       id: config.id,
@@ -88,9 +92,9 @@ function Ball2(config = {}) {
   }
 
   self.ctrl.down = delta => {
+    if (self.isLockMove || currentKey !== 'down') return
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
-    const speed = stopMoveTimeout ? self.speed / 2 : self.speed
-    self.container.y += delta * speed
+    self.container.y += delta * self.speed
     self.direct = ['y', +1]
     window.$command({
       id: config.id,
@@ -101,40 +105,43 @@ function Ball2(config = {}) {
     })
   }
 
+  let moveTicker = {
+    up: new window.PIXI.Ticker().add(self.ctrl.up),
+    down: new window.PIXI.Ticker().add(self.ctrl.down),
+    left: new window.PIXI.Ticker().add(self.ctrl.left),
+    right: new window.PIXI.Ticker().add(self.ctrl.right)
+  }
+
+  function stopMove() {
+    for (let i in move) {
+      if (move[i]) {
+        moveTicker[i].stop()
+        move[i] = false
+      }
+    }
+  }
+
   self.ctrl.move = data => {
-    if (stopMoveTimeout) {
-      clearTimeout(stopMoveTimeout)
-      stopMoveTimeout = null
-    }
-
-    if (self.isLockMove) {
-      currentMoveTicker.remove(self.ctrl[currentMove])
-      currentMoveTicker.stop()
-      currentMove = null
-      return
-    }
-
     if (!self.isAtk) {
       self.buildWeaponPosition()
     }
-    if (data.key !== 'stop' && currentMove && data.key !== currentMove) {
-      currentMoveTicker.stop()
-      currentMoveTicker.remove(self.ctrl[currentMove])
+    if (self.isLockMove) {
+      return stopMove()
     }
-    if (data.key === 'stop') {
-      stopMoveTimeout = setTimeout(() => {
-        currentMoveTicker.stop()
-        currentMoveTicker.remove(self.ctrl[currentMove])
-        currentMove = null
-      }, 150)
 
+    if (data.name === 'stop') {
+      if (move[data.key]) {
+        moveTicker[data.key].stop()
+        move[data.key] = false
+      }
       return
     }
-    if (currentMove === data.key) return
 
-    currentMove = data.key
-    currentMoveTicker.add(self.ctrl[data.key])
-    currentMoveTicker.start()
+    if (move[data.key]) return
+
+    currentKey = data.key
+    move[data.key] = true
+    moveTicker[data.key].start()
   }
 
   self.command.position = data => {
@@ -214,6 +221,7 @@ function Ball2(config = {}) {
   // S1
   const s1 = {
     ticker: new window.PIXI.Ticker(),
+    sound: window.$helper.sound(`${namespace}s1.mp3`),
     isEnabled: true,
     atk: 100,
     speed: 7,
@@ -239,11 +247,11 @@ function Ball2(config = {}) {
       }
     }
 
-    const speed = s1.speed * delta + s4.currentRange / 10
+    const speed = s1.speed * delta + s1.currentRange / 10
     self.weapon.angle += s1.currenDirect[1] * speed
-    s4.currentRange += speed
+    s1.currentRange += speed
 
-    if (s4.currentRange >= s1.angle) {
+    if (s1.currentRange >= s1.angle) {
       setTimeout(() => {
         s1.isEnabled = true
         self.isAtk = false
@@ -269,7 +277,9 @@ function Ball2(config = {}) {
       self.isAtk = true
     }
 
-    s4.currentRange = 0
+    s1.sound.play()
+
+    s1.currentRange = 0
     s1.isHit = false
     s1.crit = window.$helper.getRandomFrom(s3.critMin, s3.critMax)
     s1.isCrit = s1.crit > s3.critMax / 2
@@ -284,6 +294,7 @@ function Ball2(config = {}) {
   // S2
   const s2 = {
     isEnabled: true,
+    sound: window.$helper.sound(`${namespace}s2.mp3`),
     defPercent: 80,
     time: 1000,
     isRun: false,
@@ -299,9 +310,10 @@ function Ball2(config = {}) {
         id: window.id,
         name: 's2'
       })
-      if (currentMoveTicker) currentMoveTicker.stop()
+      stopMove()
       self.isLockMove = true
     }
+    s2.sound.play()
     s2.isRun = true
     s2.isEnabled = false
 
@@ -343,7 +355,8 @@ function Ball2(config = {}) {
     time: 9000,
     weaponWidth: window.$6_point,
     weaponHeight: window.$20_point,
-    s1Atk: 130
+    s1Atk: 130,
+    sound: window.$helper.sound(`${namespace}s4.mp3`)
   }
 
   self.ctrl.s4 = () => {
@@ -358,6 +371,7 @@ function Ball2(config = {}) {
       s2.isEnabled = false
     }
     s4.isRun = true
+    s4.sound.play()
     const weaponWidthOrg = self.weapon.width
     const weaponHeightOrg = self.weapon.height
     const s1AtkOld = s1.atk

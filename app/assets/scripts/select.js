@@ -1,6 +1,8 @@
 window.room = null
 
 window.onSetup = () => {
+  window.selectBgAudio = new Audio('/assets/sounds/click.mp3')
+
   let ballTemplate = ''
   for (let i in window.BALLS) {
     ballTemplate += `

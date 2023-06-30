@@ -95,34 +95,56 @@ window.buildGame = () => {
 
   document.addEventListener('keydown', event => {
     if (event.which === 68) {
-      window.$players[window.id].ball.ctrl.move({
+      return window.$players[window.id].ball.ctrl.move({
         key: 'right'
       })
     }
 
     if (event.which === 87) {
-      window.$players[window.id].ball.ctrl.move({
+      return window.$players[window.id].ball.ctrl.move({
         key: 'up'
       })
     }
 
     if (event.which === 65) {
-      window.$players[window.id].ball.ctrl.move({
+      return window.$players[window.id].ball.ctrl.move({
         key: 'left'
       })
     }
 
     if (event.which === 83) {
-      window.$players[window.id].ball.ctrl.move({
+      return window.$players[window.id].ball.ctrl.move({
         key: 'down'
       })
     }
   })
 
   document.addEventListener('keyup', function (event) {
-    if ([68, 65, 87, 83].indexOf(event.which) > -1) {
+    if (event.which === 68) {
+      return window.$players[window.id].ball.ctrl.move({
+        key: 'right',
+        name: 'stop'
+      })
+    }
+
+    if (event.which === 87) {
+      return window.$players[window.id].ball.ctrl.move({
+        key: 'up',
+        name: 'stop'
+      })
+    }
+
+    if (event.which === 65) {
+      return window.$players[window.id].ball.ctrl.move({
+        key: 'left',
+        name: 'stop'
+      })
+    }
+
+    if (event.which === 83) {
       window.$players[window.id].ball.ctrl.move({
-        key: 'stop'
+        key: 'down',
+        name: 'stop'
       })
     }
   })
@@ -171,14 +193,14 @@ window.$goRoomPage = () => {
   window.location.href = '/room'
 }
 
-window.onbeforeunload = function () {
-  window.$command({
-    name: 'gameOver',
-    id: window.id
-  })
+// window.onbeforeunload = function () {
+//   window.$command({
+//     name: 'gameOver',
+//     id: window.id
+//   })
 
-  return 'Are you sure want to LOGOUT the session ?'
-}
+//   return 'Are you sure want to LOGOUT the session ?'
+// }
 
 window.openDialog = title => {
   document.querySelector('#dialog').innerHTML = `
