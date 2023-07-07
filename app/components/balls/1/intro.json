@@ -12,22 +12,22 @@
     {
       "name": "Hỏa Cầu",
       "image": "components/balls/1/s1-icon.svg",
-      "description": "Bắn ra 1 quả cầu lửa thiêu đốt kẻ địch trúng phải. Gây 100 sát thương."
+      "description": "Bắn ra 1 quả cầu lửa gây 100 sát thương."
     },
     {
       "name": "Hàn Băng",
       "image": "components/balls/1/s2-icon.svg",
-      "description": "Bắn ra 1 quả cầu băng gây 50 sát thương và làm đóng băng đối thủ 1 giây."
+      "description": "Bắn ra 1 quả cầu băng gây 50 sát thương và làm đóng băng 1 giây."
     },
     {
       "name": "Vùng đất chết",
       "image": "components/balls/1/s3-icon.svg",
-      "description": "Ném 1 lọ thuốc độc và nổ lan ra xung quanh. Gây 150 sát thương."
+      "description": "Ném 1 lọ thuốc độc và nổ lan ra xung quanh. Gây 150 sát thương sau khi nổ."
     },
     {
       "name": "Cơn thịnh nộ của thần thánh",
       "image": "components/balls/1/s4-icon.svg",
-      "description": "Triệu hồi 1 tia sét phóng mạnh về phía đối thủ gây 400 sát thương."
+      "description": "Triệu hồi 1 tia sét phóng mạnh về phía đối thủ gây 300 sát thương."
     }
   ]
 }
