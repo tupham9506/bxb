@@ -1,0 +1,33 @@
+{
+  "id": 1,
+  "name": "???",
+  "nickname": "Ám",
+  "range": 3,
+  "hp": 4,
+  "speed": 8,
+  "strength": 7,
+  "image": "components/balls/3/ball.svg",
+  "tip": "",
+  "skills": [
+    {
+      "name": "Ám",
+      "image": "components/balls/3/s1-icon.svg",
+      "description": "Bắn ám khí về phía kẻ địch, gây 50 sát thương. Đánh dấu kẻ địch trong 3 giây."
+    },
+    {
+      "name": "Nhập",
+      "image": "components/balls/3/s2-icon.svg",
+      "description": "Nhập vào đối thủ đang bị đánh dấu và gây 100 sát thương."
+    },
+    {
+      "name": "Xuất",
+      "image": "components/balls/3/s3-icon.svg",
+      "description": "Trở về vị trí ban đầu sau khi nhập vào đối thủ."
+    },
+    {
+      "name": "Khí",
+      "image": "components/balls/3/s4-icon.svg",
+      "description": "Lướt nhanh về phía trước. Nếu trúng kẻ địch sẽ gây 200 sát thương và đánh dấu kẻ địch trong 3 giây."
+    }
+  ]
+}

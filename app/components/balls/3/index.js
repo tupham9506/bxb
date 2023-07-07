@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
-function Ball1(config = {}) {
+function Ball3(config = {}) {
   const self = this
-  const namespace = 'components/balls/1/'
+  const namespace = 'components/balls/3/'
 
   // Ball info
   self.hp = 1000
@@ -21,10 +21,6 @@ function Ball1(config = {}) {
 
   const ballTexture = window.PIXI.Texture.from(namespace + 'ball.svg')
   const s1Texture = window.PIXI.Texture.from(namespace + 's1.svg')
-  const s2Texture = window.PIXI.Texture.from(namespace + 's2.svg')
-  const s3Texture = window.PIXI.Texture.from(namespace + 's3.svg')
-  const s3EndTexture = window.PIXI.Texture.from(namespace + 's3-end.svg')
-  const s4Texture = window.PIXI.Texture.from(namespace + 's4.svg')
 
   self.ball = new window.PIXI.Sprite(ballTexture)
   self.ball.width = window.$10_point
@@ -186,17 +182,18 @@ function Ball1(config = {}) {
     const hpSelector = document.querySelector(`[user-id="${config.id}"] .hp-bar-remain`)
     if (hpSelector) {
       hpSelector.style.width = (self.hp / self.hpTotal) * 100 + '%'
-      // hpSelector.innerHTML = self.hp
     }
   }
 
   // S1
   const s1 = {
-    src: window.$helper.sprite(s1Texture, window.$10_point, window.$5_point),
+    src: window.$helper.sprite(s1Texture, window.$10_point, window.$2_point),
     ticker: new window.PIXI.Ticker(),
     isEnabled: true,
-    atk: 100,
-    speed: window.$1_point,
+    atk: 50,
+    speed: 1.2 * window.$1_point,
+    timeout: 3000,
+    timeoutId: null,
     sound: window.$helper.sound(`${namespace}s1.mp3`)
   }
 
@@ -221,13 +218,19 @@ function Ball1(config = {}) {
     s1.src[s1.currentDirect[0]] = s1.src[s1.currentDirect[0]] + s1.currentDirect[1] * speed
     s1.currentRange += speed
 
-    if (s1.isHit || s1.currentRange >= window.$50_point) {
-      window.$pixi.stage.removeChild(s1.src)
+    if (s1.isHit || s1.currentRange >= window.$30_point) {
+      if (s1.isHit) {
+        s1.timeoutId = setTimeout(() => {
+          s1.timeoutId = null
+        }, s1.timeout)
+      }
       s1.sound.stop()
-      if (s1.currentRange >= window.$50_point) {
+      if (s1.currentRange >= window.$30_point) {
         s1.isEnabled = true
         s1.ticker.stop()
       }
+      window.$pixi.stage.removeChild(s1.src)
+      if (!s1.isHit) s1.timeoutId = null
     }
   })
 
@@ -242,6 +245,8 @@ function Ball1(config = {}) {
       })
       s1.isEnabled = false
     }
+    clearTimeout(s1.timeoutId)
+    s1.timeoutId = null
     s1.sound.play()
 
     s1.currentDirect = [...self.direct]
@@ -262,53 +267,11 @@ function Ball1(config = {}) {
 
   // S2
   const s2 = {
-    src: window.$helper.sprite(s2Texture, window.$10_point, window.$10_point),
-    ticker: new window.PIXI.Ticker(),
     isEnabled: true,
-    atk: 50,
-    speed: window.$1_point,
-    range: window.$100_point,
+    atk: 100,
     effectTime: 1000,
     sound: window.$helper.sound(`${namespace}s2.mp3`)
   }
-
-  s2.ticker.add(delta => {
-    if (!s2.isHit) {
-      for (let i in window.$players) {
-        if (i === config.id) continue
-        s2.isHit = window.$helper.isHit(s2.src, window.$players[i].ball.ball)
-
-        if (config.isMe && s2.isHit) {
-          window.$command({
-            name: 'lockMove',
-            effectTime: s2.effectTime,
-            id: i
-          })
-          window.$command({
-            name: 'hp',
-            hp: -s2.atk,
-            id: i,
-            title: 'Bị Đóng Băng',
-            time: s2.effectTime
-          })
-          break
-        }
-      }
-    }
-
-    const speed = s2.speed * delta
-    s2.src[s2.currenDirect[0]] = s2.src[s2.currenDirect[0]] + s2.currenDirect[1] * speed
-
-    s2.currentRange += speed
-    if (s2.isHit || s2.currentRange >= s2.range) {
-      window.$pixi.stage.removeChild(s2.src)
-      s2.sound.stop()
-      if (s2.currentRange >= window.$50_point) {
-        s2.isEnabled = true
-        s2.ticker.stop()
-      }
-    }
-  })
 
   s2.ctrl = () => {
     if (config.isMe) {
@@ -319,112 +282,59 @@ function Ball1(config = {}) {
         id: window.id,
         name: 's2'
       })
-      s2.isEnabled = false
     }
 
-    s2.sound.play()
+    if (!s1.timeoutId) return
 
-    s2.currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s2.currenDirect, s2.src)
-    s2.src.x = anchor.x
-    s2.src.y = anchor.y
-    s2.src.angle = window.$helper.angleByDirect(s2.currenDirect)
-    window.$pixi.stage.addChild(s2.src)
-
-    s2.currentRange = 0
-    s2.isHit = false
-    s2.ticker.start()
+    for (let i in window.$players) {
+      if (i !== config.id) {
+        s1.timeoutId = null
+        self.oldX = self.container.x
+        self.oldY = self.container.y
+        self.container.x = window.$players[i].ball.container.x
+        self.container.y = window.$players[i].ball.container.y
+        window.$command({
+          name: 'hp',
+          hp: -s1.atk,
+          id: i
+        })
+        break
+      }
+    }
   }
 
-  self.ctrl.s2 = self.command.s2 = () => {
+  self.ctrl.s2 = () => {
     s2.ctrl()
+  }
+
+  self.command.s2 = () => {
+    if (!config.isMe) {
+      s2.ctrl()
+    }
   }
 
   // S3
   const s3 = {
-    src: window.$helper.sprite(s3Texture, window.$10_point, window.$10_point),
-    endSrc: window.$helper.sprite(s3EndTexture, window.$10_point, window.$10_point),
-    ticker: new window.PIXI.Ticker(),
-    tickerEnd: new window.PIXI.Ticker(),
     isEnabled: true,
-    atk: 150,
-    speed: window.$1_point,
-    range: window.$40_point,
-    endSize: window.$20_point,
-    endTime: 1,
     sound: window.$helper.sound(`${namespace}s3-end.mp3`)
   }
 
-  s3.ticker.add(delta => {
-    const speed = s3.speed * delta
-    s3.src[s3.currenDirect[0]] = s3.src[s3.currenDirect[0]] + s3.currenDirect[1] * speed
-    s3.src.rotation += 0.1
-
-    s3.currentRange += speed
-    if (s3.currentRange >= s3.range) {
-      window.$pixi.stage.removeChild(s3.src)
-      s3.endSrc.x = s3.src.x
-      s3.endSrc.y = s3.src.y
-      s3.ticker.stop()
-      s3.tickerEnd.start()
-      s3.sound.play()
-    }
-  })
-
-  s3.tickerEnd.add(delta => {
-    window.$pixi.stage.addChild(s3.endSrc)
-    if (!s3.isHit) {
-      for (let i in window.$players) {
-        if (i === config.id) continue
-        s3.isHit = window.$helper.isHit(s3.endSrc, window.$players[i].ball.ball)
-        if (config.isMe && s3.isHit) {
-          window.$command({
-            name: 'hp',
-            hp: -s3.atk,
-            id: i
-          })
-          break
-        }
-      }
-    }
-
-    s3.endSrc.width += window.$1_point * delta
-    s3.endSrc.height += window.$1_point * delta
-
-    if (s3.endSrc.width >= s3.endSize) {
-      s3.tickerEnd.stop()
-
-      setTimeout(() => {
-        window.$pixi.stage.removeChild(s3.endSrc)
-        s3.endSrc.width = window.$10_point
-        s3.endSrc.height = window.$10_point
-        s3.isEnabled = true
-      }, s3.endTime * 1000)
-    }
-  })
-
   s3.ctrl = () => {
+    if (!self.oldX) return false
+
     if (config.isMe) {
-      if (!s3.isEnabled) return
       if (self.isLockSkill) return
 
       window.$command({
         id: window.id,
         name: 's3'
       })
-      s3.isEnabled = false
     }
 
-    s3.currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s3.currenDirect, s3.src)
-    s3.src.x = anchor.x
-    s3.src.y = anchor.y
-    s3.src.angle = window.$helper.angleByDirect(s3.currenDirect)
-    window.$pixi.stage.addChild(s3.src)
-
-    s3.currentRange = 0
-    s3.isHit = false
-    s3.ticker.start()
+    self.container.x = self.oldX
+    self.container.y = self.oldY
+    self.oldX = null
+    self.oldY = null
   }
 
   self.ctrl.s3 = self.command.s3 = () => {
@@ -433,11 +343,10 @@ function Ball1(config = {}) {
 
   // S4
   const s4 = {
-    src: window.$helper.sprite(s4Texture, window.$30_point, window.$10_point),
     ticker: new window.PIXI.Ticker(),
     isEnabled: true,
-    atk: 300,
-    speed: window.$2_point,
+    atk: 200,
+    speed: window.$5_point,
     sound: window.$helper.sound(`${namespace}s4.mp3`)
   }
 
@@ -445,7 +354,8 @@ function Ball1(config = {}) {
     if (!s4.isHit) {
       for (let i in window.$players) {
         if (i === config.id) continue
-        s4.isHit = window.$helper.isHit(s4.src, window.$players[i].ball.ball)
+        s4.isHit = window.$helper.isHit(self.ball, window.$players[i].ball.ball)
+
         if (config.isMe && s4.isHit) {
           window.$command({
             name: 'hp',
@@ -456,21 +366,33 @@ function Ball1(config = {}) {
         }
       }
     }
-    const speed = s4.speed * delta
-    s4.src[s4.currenDirect[0]] = s4.src[s4.currenDirect[0]] + s4.currenDirect[1] * speed
-    s4.currentRange += speed
-    if (s4.isHit || s4.currentRange >= 2 * window.$100_point) {
-      window.$pixi.stage.removeChild(s4.src)
-      if (s4.currentRange >= window.$100_point) {
+
+    const outArea = window.$helper.isOutArea(self.ball, self.direct)
+    if (s4.isHit || outArea) {
+      if (s4.isHit) {
+        s1.timeoutId = setTimeout(() => {
+          s1.timeoutId = null
+        }, s1.timeout)
+      }
+      self.isLockMove = false
+
+      if (outArea) {
         s4.ticker.stop()
+        self.container[outArea[0]] = outArea[1]
+
+        return
       }
     }
+
+    const speed = s4.speed * delta
+    self.container[self.direct[0]] = self.container[self.direct[0]] + self.direct[1] * speed
   })
 
   s4.ctrl = () => {
     if (config.isMe) {
       if (!s4.isEnabled) return
       if (self.isLockSkill) return
+      self.isLockMove = true
 
       window.$command({
         id: window.id,
@@ -480,14 +402,6 @@ function Ball1(config = {}) {
     }
 
     s4.sound.play()
-
-    s4.currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s4.currenDirect, s4.src)
-    s4.src.x = anchor.x
-    s4.src.y = anchor.y
-    s4.src.angle = window.$helper.angleByDirect(s4.currenDirect)
-    window.$pixi.stage.addChild(s4.src)
-    s4.currentRange = 0
     s4.isHit = false
     s4.ticker.start()
   }

@@ -224,7 +224,7 @@ function Ball2(config = {}) {
     sound: window.$helper.sound(`${namespace}s1.mp3`),
     isEnabled: true,
     atk: 100,
-    speed: 7,
+    speed: 6,
     angle: 75,
     endTime: 500
   }
@@ -295,7 +295,7 @@ function Ball2(config = {}) {
   const s2 = {
     isEnabled: true,
     sound: window.$helper.sound(`${namespace}s2.mp3`),
-    defPercent: 80,
+    defPercent: 50,
     time: 1000,
     isRun: false,
     delay: 2000
@@ -355,7 +355,7 @@ function Ball2(config = {}) {
     time: 9000,
     weaponWidth: window.$6_point,
     weaponHeight: window.$20_point,
-    s1Atk: 130,
+    s1Atk: 120,
     sound: window.$helper.sound(`${namespace}s4.mp3`)
   }
 

@@ -1,12 +1,12 @@
 window.$helper = {
   angleByDirect: direct => {
     if (direct[0] === 'x') {
-      if (direct[1] === 1) return 90
-      return -90
+      if (direct[1] === 1) return 0
+      return -180
     }
 
-    if (direct[1] === -1) return 0
-    return 180
+    if (direct[1] === -1) return -90
+    return 90
   },
   positionWeaponByDirect: (direct, element) => {
     if (direct[0] === 'x') {
@@ -107,5 +107,30 @@ window.$helper = {
       url: url,
       preload: true
     })
+  },
+  isOutArea: (element, currenDirect) => {
+    const elementPos = element.getGlobalPosition()
+    if (currenDirect[0] === 'x') {
+      if (currenDirect[1] === -1) {
+        if (elementPos.x - window.$point <= 0) return ['x', element.width / 2]
+      }
+      if (elementPos.x + element.width + window.$point >= window.$pixi.screen.width) {
+        return ['x', window.$pixi.screen.width - element.width / 2]
+      }
+      return
+    }
+
+    if (currenDirect[1] === -1) {
+      if (elementPos.y - window.$point <= 0) {
+        return ['y', element.height / 2]
+      }
+      return
+    }
+
+    if (elementPos.y + element.height + window.$point >= window.$pixi.screen.height) {
+      return ['y', window.$pixi.screen.height - element.height / 2]
+    }
+
+    return
   }
 }

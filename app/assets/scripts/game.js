@@ -45,15 +45,6 @@ window.buildGame = () => {
     resolution: 1
   })
 
-  // const backgroundTexture = window.PIXI.Texture.from('assets/images/home-bg.jpg')
-  // let background = new window.PIXI.Sprite(backgroundTexture)
-  // background.x = 0
-  // background.y = 0
-  // background.alpha = 0.05
-  // background.width = window.innerWidth
-  // background.height = window.innerHeight
-  // window.$pixi.stage.addChild(background)
-
   document.querySelector('bxb').appendChild(window.$pixi.view)
 
   window.$point = innerHeight / 100
@@ -94,95 +85,68 @@ window.buildGame = () => {
   }
 
   document.addEventListener('keydown', event => {
-    if (event.which === 68) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'right'
-      })
+    if (['d', 'đ', 'D', 'Đ'].indexOf(event.key) > -1) {
+      return window.$commandMove('right')
     }
 
-    if (event.which === 87) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'up'
-      })
+    if (['a', 'A'].indexOf(event.key) > -1) {
+      return window.$commandMove('left')
     }
 
-    if (event.which === 65) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'left'
-      })
+    if (['w', 'ư', 'Ư', 'W'].indexOf(event.key) > -1) {
+      return window.$commandMove('up')
     }
 
-    if (event.which === 83) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'down'
-      })
+    if (['s', 'S'].indexOf(event.key) > -1) {
+      return window.$commandMove('down')
     }
   })
 
   document.addEventListener('keyup', function (event) {
-    if (event.which === 68) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'right',
-        name: 'stop'
-      })
+    if (['d', 'đ', 'D', 'Đ'].indexOf(event.key) > -1) {
+      return window.$commandMoveStop('right')
     }
 
-    if (event.which === 87) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'up',
-        name: 'stop'
-      })
+    if (['a', 'A'].indexOf(event.key) > -1) {
+      return window.$commandMoveStop('left')
     }
 
-    if (event.which === 65) {
-      return window.$players[window.id].ball.ctrl.move({
-        key: 'left',
-        name: 'stop'
-      })
+    if (['w', 'ư', 'Ư', 'W'].indexOf(event.key) > -1) {
+      return window.$commandMoveStop('up')
     }
 
-    if (event.which === 83) {
-      window.$players[window.id].ball.ctrl.move({
-        key: 'down',
-        name: 'stop'
-      })
+    if (['s', 'S'].indexOf(event.key) > -1) {
+      return window.$commandMoveStop('down')
     }
   })
 
   document.addEventListener('keypress', function (event) {
-    if (event.which === 106) {
+    if (['j', 'J'].indexOf(event.key) > -1) {
       return window.$players[window.id].ball.ctrl.s1()
     }
-    if (event.keyCode === 107) {
+    if (['k', 'K'].indexOf(event.key) > -1) {
       return window.$players[window.id].ball.ctrl.s2()
     }
-    if (event.keyCode === 108) {
+    if (['l', 'L'].indexOf(event.key) > -1) {
       return window.$players[window.id].ball.ctrl.s3()
     }
-    if (event.keyCode === 111) {
+    if (['o', 'ô', 'O', 'Ô'].indexOf(event.key) > -1) {
       return window.$players[window.id].ball.ctrl.s4()
     }
   })
+}
 
-  // if (window.id !== window.$room.userId) {
-  //   var count = 0
-  //   setInterval(() => {
-  //     window.$players[window.id].ball.ctrl.s1()
-  //     window.$players[window.id].ball.ctrl.s2()
-  //     window.$players[window.id].ball.ctrl.s3()
-  //     if (count >= 100) {
-  //       window.$players[window.id].ball.ctrl.move({
-  //         key: 'right'
-  //       })
-  //       count--
-  //     } else if (count <= 100) {
-  //       window.$players[window.id].ball.ctrl.move({
-  //         key: 'left'
-  //       })
-  //       count++
-  //     }
-  //   }, 1)
-  // }
+window.$commandMove = key => {
+  return window.$players[window.id].ball.ctrl.move({
+    key: key
+  })
+}
+
+window.$commandMoveStop = key => {
+  return window.$players[window.id].ball.ctrl.move({
+    key: key,
+    name: 'stop'
+  })
 }
 
 window.$command = data => {
@@ -193,14 +157,14 @@ window.$goRoomPage = () => {
   window.location.href = '/room'
 }
 
-// window.onbeforeunload = function () {
-//   window.$command({
-//     name: 'gameOver',
-//     id: window.id
-//   })
+window.onbeforeunload = function () {
+  window.$command({
+    name: 'gameOver',
+    id: window.id
+  })
 
-//   return 'Are you sure want to LOGOUT the session ?'
-// }
+  return 'Are you sure want to LOGOUT the session ?'
+}
 
 window.openDialog = title => {
   document.querySelector('#dialog').innerHTML = `
