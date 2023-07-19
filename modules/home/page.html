@@ -51,6 +51,15 @@
         },
         true
       )
+
+      window.addEventListener('resize', onResize)
+      onResize()
+    }
+
+    function onResize () {
+      if (window.innerHeight > window.innerWidth) {
+        alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
+      }
     }
 
     async function start () {

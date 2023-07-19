@@ -12,6 +12,7 @@ function Ball3(config = {}) {
   self.isLockSkill = false
   self.ctrl = {}
   self.command = {}
+  self.config = config
 
   // Ball container
   self.container = new window.PIXI.Container()
@@ -21,13 +22,21 @@ function Ball3(config = {}) {
 
   const ballTexture = window.PIXI.Texture.from(namespace + 'ball.svg')
   const s1Texture = window.PIXI.Texture.from(namespace + 's1.svg')
+  const ballS2Texture = window.PIXI.Texture.from(namespace + 'ball-s2.svg')
 
   self.ball = new window.PIXI.Sprite(ballTexture)
   self.ball.width = window.$10_point
   self.ball.height = window.$10_point
   self.ball.anchor.set(0.5)
 
+  const ballS2 = new window.PIXI.Sprite(ballS2Texture)
+  ballS2.width = window.$10_point
+  ballS2.height = window.$10_point
+  ballS2.anchor.set(0.5)
+
   self.container.addChild(self.ball)
+  window.$helper.buildArrow(self)
+
   self.text = null
   let currentKey = null
   let move = {
@@ -43,6 +52,7 @@ function Ball3(config = {}) {
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     self.container.x -= delta * self.speed
     self.direct = ['x', -1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -57,6 +67,7 @@ function Ball3(config = {}) {
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
     self.container.x += delta * self.speed
     self.direct = ['x', +1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -71,6 +82,7 @@ function Ball3(config = {}) {
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
     self.container.y -= delta * self.speed
     self.direct = ['y', -1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -85,6 +97,7 @@ function Ball3(config = {}) {
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
     self.container.y += delta * self.speed
     self.direct = ['y', +1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -270,6 +283,8 @@ function Ball3(config = {}) {
     isEnabled: true,
     atk: 100,
     effectTime: 1000,
+    effectEndTime: 3000,
+    effectTimeOut: null,
     sound: window.$helper.sound(`${namespace}s2.mp3`)
   }
 
@@ -293,6 +308,15 @@ function Ball3(config = {}) {
         self.oldY = self.container.y
         self.container.x = window.$players[i].ball.container.x
         self.container.y = window.$players[i].ball.container.y
+        ballS2.x = self.oldX
+        ballS2.y = self.oldY
+        window.$pixi.stage.addChild(ballS2)
+
+        if (s2.effectTimeOut) clearTimeout(s2.effectTimeOut)
+        s2.effectTimeOut = setTimeout(() => {
+          window.$pixi.stage.removeChild(ballS2)
+        }, s2.effectEndTime)
+
         window.$command({
           name: 'hp',
           hp: -s1.atk,
@@ -335,6 +359,7 @@ function Ball3(config = {}) {
     self.container.y = self.oldY
     self.oldX = null
     self.oldY = null
+    window.$pixi.stage.removeChild(ballS2)
   }
 
   self.ctrl.s3 = self.command.s3 = () => {
@@ -411,4 +436,5 @@ function Ball3(config = {}) {
   }
 
   self.buildHp()
+  window.$helper.showArrow(self)
 }

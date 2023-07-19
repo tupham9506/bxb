@@ -75,6 +75,27 @@ window.buildGame = () => {
       document.querySelector('#bar-other .user-name').innerHTML = window.$players[i].userName
     }
 
+    if (isMe) {
+      document.querySelector('.skill-ctrl').innerHTML = `
+        <div class="skill-ctrl-item">
+          <span>J</span>
+          <img src="components/balls/${window.$players[i].ballId}/s1-icon.svg">
+        </div>
+        <div class="skill-ctrl-item">
+          <span>K</span>
+          <img src="components/balls/${window.$players[i].ballId}/s2-icon.svg">
+        </div>
+        <div class="skill-ctrl-item">
+          <span>L</span>
+          <img src="components/balls/${window.$players[i].ballId}/s3-icon.svg">
+        </div>
+        <div class="skill-ctrl-item">
+          <span>O</span>
+          <img src="components/balls/${window.$players[i].ballId}/s4-icon.svg">
+        </div>
+      `
+    }
+
     window.$players[i].ball = new window[`Ball${window.$players[i].ballId}`]({
       id: i,
       isMe: isMe,
@@ -157,14 +178,14 @@ window.$goRoomPage = () => {
   window.location.href = '/room'
 }
 
-window.onbeforeunload = function () {
-  window.$command({
-    name: 'gameOver',
-    id: window.id
-  })
+// window.onbeforeunload = function () {
+//   window.$command({
+//     name: 'gameOver',
+//     id: window.id
+//   })
 
-  return 'Are you sure want to LOGOUT the session ?'
-}
+//   return 'Are you sure want to LOGOUT the session ?'
+// }
 
 window.openDialog = title => {
   document.querySelector('#dialog').innerHTML = `

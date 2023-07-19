@@ -12,6 +12,7 @@ function Ball1(config = {}) {
   self.isLockSkill = false
   self.ctrl = {}
   self.command = {}
+  self.config = config
 
   // Ball container
   self.container = new window.PIXI.Container()
@@ -32,6 +33,8 @@ function Ball1(config = {}) {
   self.ball.anchor.set(0.5)
 
   self.container.addChild(self.ball)
+
+  window.$helper.buildArrow(self)
   self.text = null
   let currentKey = null
   let move = {
@@ -47,6 +50,7 @@ function Ball1(config = {}) {
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     self.container.x -= delta * self.speed
     self.direct = ['x', -1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -61,6 +65,7 @@ function Ball1(config = {}) {
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
     self.container.x += delta * self.speed
     self.direct = ['x', +1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -75,6 +80,7 @@ function Ball1(config = {}) {
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
     self.container.y -= delta * self.speed
     self.direct = ['y', -1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -89,6 +95,7 @@ function Ball1(config = {}) {
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
     self.container.y += delta * self.speed
     self.direct = ['y', +1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -241,6 +248,7 @@ function Ball1(config = {}) {
         name: 's1'
       })
       s1.isEnabled = false
+      self.lockSkillSpam()
     }
     s1.sound.play()
 
@@ -320,6 +328,7 @@ function Ball1(config = {}) {
         name: 's2'
       })
       s2.isEnabled = false
+      self.lockSkillSpam()
     }
 
     s2.sound.play()
@@ -413,6 +422,7 @@ function Ball1(config = {}) {
         name: 's3'
       })
       s3.isEnabled = false
+      self.lockSkillSpam()
     }
 
     s3.currenDirect = [...self.direct]
@@ -477,6 +487,7 @@ function Ball1(config = {}) {
         name: 's4'
       })
       s4.isEnabled = false
+      self.lockSkillSpam()
     }
 
     s4.sound.play()
@@ -496,5 +507,13 @@ function Ball1(config = {}) {
     s4.ctrl()
   }
 
+  self.lockSkillSpam = () => {
+    self.isLockSkill = true
+    setTimeout(() => {
+      self.isLockSkill = false
+    }, 300)
+  }
+
   self.buildHp()
+  window.$helper.showArrow(self)
 }

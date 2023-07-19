@@ -132,5 +132,72 @@ window.$helper = {
     }
 
     return
+  },
+  buildArrow: ctx => {
+    if (!ctx.config.isMe) return false
+
+    const arrowLeftTexture = window.PIXI.Texture.from('/assets/images/arrow-left.svg')
+    ctx.arrowLeft = new window.PIXI.Sprite(arrowLeftTexture)
+    ctx.arrowLeft.width = window.$2_point
+    ctx.arrowLeft.height = window.$2_point
+    ctx.arrowLeft.x = -ctx.ball.width / 2 - ctx.arrowLeft.width
+    ctx.arrowLeft.y = 0
+    ctx.arrowLeft.anchor.set(0.5)
+    ctx.arrowLeft.visible = false
+    ctx.container.addChild(ctx.arrowLeft)
+
+    const arrowRightTexture = window.PIXI.Texture.from('/assets/images/arrow-right.svg')
+    ctx.arrowRight = new window.PIXI.Sprite(arrowRightTexture)
+    ctx.arrowRight.width = window.$2_point
+    ctx.arrowRight.height = window.$2_point
+    ctx.arrowRight.x = ctx.ball.width / 2 + ctx.arrowRight.width
+    ctx.arrowRight.y = 0
+    ctx.arrowRight.anchor.set(0.5)
+    ctx.arrowRight.visible = false
+    ctx.container.addChild(ctx.arrowRight)
+
+    const arrowUpTexture = window.PIXI.Texture.from('/assets/images/arrow-up.svg')
+    ctx.arrowUp = new window.PIXI.Sprite(arrowUpTexture)
+    ctx.arrowUp.width = window.$2_point
+    ctx.arrowUp.height = window.$2_point
+    ctx.arrowUp.x = 0
+    ctx.arrowUp.y = -ctx.ball.height / 2 - ctx.arrowUp.height
+    ctx.arrowUp.anchor.set(0.5)
+    ctx.arrowUp.visible = false
+    ctx.container.addChild(ctx.arrowUp)
+
+    const arrowDownTexture = window.PIXI.Texture.from('/assets/images/arrow-down.svg')
+    ctx.arrowDown = new window.PIXI.Sprite(arrowDownTexture)
+    ctx.arrowDown.width = window.$2_point
+    ctx.arrowDown.height = window.$2_point
+    ctx.arrowDown.x = 0
+    ctx.arrowDown.y = ctx.ball.height / 2 + ctx.arrowDown.height
+    ctx.arrowDown.anchor.set(0.5)
+    ctx.arrowDown.visible = false
+    ctx.container.addChild(ctx.arrowDown)
+  },
+  showArrow: ctx => {
+    if (!ctx.config.isMe) return false
+    if (ctx.direct[0] === 'x') {
+      ctx.arrowUp.visible = false
+      ctx.arrowDown.visible = false
+      if (ctx.direct[1] === 1) {
+        ctx.arrowLeft.visible = false
+        ctx.arrowRight.visible = true
+      } else {
+        ctx.arrowLeft.visible = true
+        ctx.arrowRight.visible = false
+      }
+    } else {
+      ctx.arrowLeft.visible = false
+      ctx.arrowRight.visible = false
+      if (ctx.direct[1] === 1) {
+        ctx.arrowUp.visible = false
+        ctx.arrowDown.visible = true
+      } else {
+        ctx.arrowUp.visible = true
+        ctx.arrowDown.visible = false
+      }
+    }
   }
 }

@@ -13,6 +13,7 @@ function Ball2(config = {}) {
   self.ctrl = {}
   self.command = {}
   self.isAtk = false
+  self.config = config
 
   // Ball container
   self.container = new window.PIXI.Container()
@@ -39,6 +40,8 @@ function Ball2(config = {}) {
 
   self.container.addChild(self.ball)
   self.container.addChild(self.weapon)
+  window.$helper.buildArrow(self)
+
   self.text = null
   let currentKey = null
   let move = {
@@ -54,6 +57,7 @@ function Ball2(config = {}) {
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     self.container.x -= delta * self.speed
     self.direct = ['x', -1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -68,6 +72,7 @@ function Ball2(config = {}) {
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
     self.container.x += delta * self.speed
     self.direct = ['x', +1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -82,6 +87,7 @@ function Ball2(config = {}) {
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
     self.container.y -= delta * self.speed
     self.direct = ['y', -1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -96,6 +102,7 @@ function Ball2(config = {}) {
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
     self.container.y += delta * self.speed
     self.direct = ['y', +1]
+    window.$helper.showArrow(self)
     window.$command({
       id: config.id,
       name: 'position',
@@ -224,7 +231,7 @@ function Ball2(config = {}) {
     sound: window.$helper.sound(`${namespace}s1.mp3`),
     isEnabled: true,
     atk: 100,
-    speed: 6,
+    speed: 7,
     angle: 75,
     endTime: 500
   }
@@ -259,6 +266,7 @@ function Ball2(config = {}) {
         if (s1.isCrit && !s4.isRun) {
           self.weapon.texture = weaponTexture
         }
+        self.isLockMove = false
       }, s1.endTime)
       s1.ticker.stop()
     }
@@ -275,6 +283,7 @@ function Ball2(config = {}) {
       })
       s1.isEnabled = false
       self.isAtk = true
+      self.isLockMove = true
     }
 
     s1.sound.play()
@@ -407,4 +416,5 @@ function Ball2(config = {}) {
 
   self.buildWeaponPosition()
   self.buildHp()
+  window.$helper.showArrow(self)
 }
