@@ -31,7 +31,6 @@ window.onload = () => {
       document.querySelector('fullscreen-dialog').innerHTML = ''
     }
     window.onExitHandler = () => {
-      console.log(document.webkitIsFullScreen)
       if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
         document.querySelector('fullscreen-dialog').innerHTML = `
           <div class="dialog">
@@ -42,12 +41,12 @@ window.onload = () => {
           </div>
         `
       }
-      document.body.append(document.createElement('fullscreen-dialog'))
-      document.addEventListener('fullscreenchange', window.onExitHandler, false)
-      document.addEventListener('mozfullscreenchange', window.onExitHandler, false)
-      document.addEventListener('MSFullscreenChange', window.onExitHandler, false)
-      document.addEventListener('webkitfullscreenchange', window.onExitHandler, false)
     }
+    document.body.append(document.createElement('fullscreen-dialog'))
+    document.addEventListener('fullscreenchange', window.onExitHandler, false)
+    document.addEventListener('mozfullscreenchange', window.onExitHandler, false)
+    document.addEventListener('MSFullscreenChange', window.onExitHandler, false)
+    document.addEventListener('webkitfullscreenchange', window.onExitHandler, false)
     window.onExitHandler()
   }
 }
