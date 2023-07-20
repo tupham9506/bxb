@@ -41,7 +41,6 @@
   --color-blue: #00799C;
   --color-purple-light: #AD92EC;
   --color-purple: #9B83D4;
-
 }
 
 * {
@@ -264,4 +263,14 @@ input:focus-visible {
 
 .loading-bg::after {
   content: 'Loading';
+}
+
+.display-sp {
+  display: none;
+}
+
+@media screen and (max-width: 1399px) {
+  .display-sp {
+    display: block;
+  } 
 }

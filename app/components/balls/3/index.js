@@ -314,6 +314,8 @@ function Ball3(config = {}) {
 
         if (s2.effectTimeOut) clearTimeout(s2.effectTimeOut)
         s2.effectTimeOut = setTimeout(() => {
+          self.oldX = null
+          self.oldY = null
           window.$pixi.stage.removeChild(ballS2)
         }, s2.effectEndTime)
 

@@ -99,6 +99,11 @@
   z-index: 100;
 }
 
+.selected-ball-container .selected-ball-item img {
+  width: 100%;
+  height: 100%;
+}
+
 
 .selected-ball {
   width: 500px;

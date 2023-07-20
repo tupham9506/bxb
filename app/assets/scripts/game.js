@@ -1,6 +1,8 @@
 window.onSetup = () => {
   window.isGameOver = false
   window.isGameBuilt = false
+  window.moveX = 0
+  window.moveY = 0
   window.socket.on('connect', () => {
     window.socket.on('ROOM_DETAIL', data => {
       if (!data) window.location.href = '/room'
@@ -64,7 +66,10 @@ window.buildGame = () => {
   window.$40_point = 40 * window.$point
   window.$50_point = 50 * window.$point
   window.$100_point = 100 * window.$point
-
+  document.querySelector('.ctrl-container').style.width = `${window.$20_point}px`
+  document.querySelector('.ctrl-container').style.height = `${window.$20_point}px`
+  document.querySelector('#touch').style.width = `${window.$10_point}px`
+  document.querySelector('#touch').style.height = `${window.$10_point}px`
   for (let i in window.$players) {
     const isMe = window.id === i
     if (window.$players[i].isKey) {
@@ -77,19 +82,19 @@ window.buildGame = () => {
 
     if (isMe) {
       document.querySelector('.skill-ctrl').innerHTML = `
-        <div class="skill-ctrl-item">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s1')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
           <span>J</span>
           <img src="components/balls/${window.$players[i].ballId}/s1-icon.svg">
         </div>
-        <div class="skill-ctrl-item">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s2')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
           <span>K</span>
           <img src="components/balls/${window.$players[i].ballId}/s2-icon.svg">
         </div>
-        <div class="skill-ctrl-item">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s3')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
           <span>L</span>
           <img src="components/balls/${window.$players[i].ballId}/s3-icon.svg">
         </div>
-        <div class="skill-ctrl-item">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s4')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
           <span>O</span>
           <img src="components/balls/${window.$players[i].ballId}/s4-icon.svg">
         </div>
@@ -143,18 +148,95 @@ window.buildGame = () => {
 
   document.addEventListener('keypress', function (event) {
     if (['j', 'J'].indexOf(event.key) > -1) {
-      return window.$players[window.id].ball.ctrl.s1()
+      return window.$commandSkill('s1')
     }
     if (['k', 'K'].indexOf(event.key) > -1) {
-      return window.$players[window.id].ball.ctrl.s2()
+      return window.$commandSkill('s2')
     }
     if (['l', 'L'].indexOf(event.key) > -1) {
-      return window.$players[window.id].ball.ctrl.s3()
+      return window.$commandSkill('s3')
     }
     if (['o', 'ô', 'O', 'Ô'].indexOf(event.key) > -1) {
-      return window.$players[window.id].ball.ctrl.s4()
+      return window.$commandSkill('s4')
     }
   })
+
+  document.querySelector('#touch').addEventListener(
+    'touchstart',
+    event => {
+      const touch = event.changedTouches[0]
+      window.moveX = touch.clientX
+      window.moveY = touch.clientY
+    },
+    false
+  )
+
+  document.querySelector('#touch').addEventListener(
+    'touchmove',
+    event => {
+      const touch = event.changedTouches[0]
+      console.log(touch.clientX, window.moveX)
+      const xChange = Math.abs(touch.clientX - window.moveX)
+      const yChange = Math.abs(touch.clientY - window.moveY)
+      const currentMoveX = window.moveX
+      const currentMoveY = window.moveY
+      window.moveX = touch.clientX
+      window.moveY = touch.clientY
+      const ctrlContainerElement = document.querySelector('.ctrl-container')
+
+      if (xChange > yChange) {
+        if (touch.clientX > currentMoveX) {
+          ctrlContainerElement.style['justify-content'] = 'flex-end'
+          ctrlContainerElement.style['align-items'] = 'center'
+          window.$commandMoveStop('left')
+          window.$commandMoveStop('down')
+          window.$commandMoveStop('up')
+          return window.$commandMove('right')
+        }
+        if (touch.clientX < currentMoveX) {
+          ctrlContainerElement.style['justify-content'] = 'flex-start'
+          ctrlContainerElement.style['align-items'] = 'center'
+          window.$commandMoveStop('right')
+          window.$commandMoveStop('down')
+          window.$commandMoveStop('up')
+          return window.$commandMove('left')
+        }
+      }
+
+      if (touch.clientY > currentMoveY) {
+        ctrlContainerElement.style['justify-content'] = 'center'
+        ctrlContainerElement.style['align-items'] = 'flex-end'
+        window.$commandMoveStop('left')
+        window.$commandMoveStop('right')
+        window.$commandMoveStop('up')
+        return window.$commandMove('down')
+      }
+
+      if (touch.clientY < currentMoveY) {
+        ctrlContainerElement.style['justify-content'] = 'center'
+        ctrlContainerElement.style['align-items'] = 'start'
+        window.$commandMoveStop('left')
+        window.$commandMoveStop('down')
+        window.$commandMoveStop('right')
+        return window.$commandMove('up')
+      }
+    },
+    false
+  )
+
+  document.querySelector('#touch').addEventListener(
+    'touchend',
+    () => {
+      const ctrlContainerElement = document.querySelector('.ctrl-container')
+      ctrlContainerElement.style['justify-content'] = 'center'
+      ctrlContainerElement.style['align-items'] = 'center'
+      window.$commandMoveStop('left')
+      window.$commandMoveStop('down')
+      window.$commandMoveStop('right')
+      window.$commandMoveStop('up')
+    },
+    false
+  )
 }
 
 window.$commandMove = key => {
@@ -168,6 +250,10 @@ window.$commandMoveStop = key => {
     key: key,
     name: 'stop'
   })
+}
+
+window.$commandSkill = skill => {
+  return window.$players[window.id].ball.ctrl[skill]()
 }
 
 window.$command = data => {
