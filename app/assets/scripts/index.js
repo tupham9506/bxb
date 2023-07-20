@@ -21,40 +21,39 @@ window.onload = () => {
     window.onSetup()
   }
 
-  window.addEventListener('resize', onResize)
-  onResize()
-
-  window.$reqFullScreen = () => {
-    document.body.requestFullscreen()
-    screen.orientation.lock('landscape')
-    document.querySelector('fullscreen-dialog').innerHTML = ''
-  }
+  // window.addEventListener('resize', onResize)
+  // onResize()
 
   if (window.$helper.isMobile) {
-    document.body.append(document.createElement('fullscreen-dialog'))
-    document.addEventListener('fullscreenchange', window.exitHandler, false)
-    document.addEventListener('mozfullscreenchange', window.exitHandler, false)
-    document.addEventListener('MSFullscreenChange', window.exitHandler, false)
-    document.addEventListener('webkitfullscreenchange', window.exitHandler, false)
-    window.exitHandler()
-  }
-  window.exitHandler = () => {
-    console.log(document.webkitIsFullScreen)
-    if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
-      document.querySelector('fullscreen-dialog').innerHTML = `
-        <div class="dialog">
-          <div class="dialog-content card">
-            <div>Bạn đã thoát chế độ toàn màn hình</div>
-            <button type="button" class="btn full" onclick="window.$reqFullScreen()">Bật toàn màn hình</button>
+    window.$reqFullScreen = () => {
+      document.body.requestFullscreen()
+      screen.orientation.lock('landscape')
+      document.querySelector('fullscreen-dialog').innerHTML = ''
+    }
+    window.exitHandler = () => {
+      console.log(document.webkitIsFullScreen)
+      if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+        document.querySelector('fullscreen-dialog').innerHTML = `
+          <div class="dialog">
+            <div class="dialog-content card">
+              <div>Bạn đã thoát chế độ toàn màn hình</div>
+              <button type="button" class="btn full" onclick="window.$reqFullScreen()">Bật toàn màn hình</button>
+            </div>
           </div>
-        </div>
-      `
+        `
+      }
+      document.body.append(document.createElement('fullscreen-dialog'))
+      document.addEventListener('fullscreenchange', window.exitHandler, false)
+      document.addEventListener('mozfullscreenchange', window.exitHandler, false)
+      document.addEventListener('MSFullscreenChange', window.exitHandler, false)
+      document.addEventListener('webkitfullscreenchange', window.exitHandler, false)
+      window.exitHandler()
     }
   }
 }
 
-function onResize() {
-  if (window.innerHeight > window.innerWidth) {
-    alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
-  }
-}
+// function onResize() {
+//   if (window.innerHeight > window.innerWidth) {
+//     alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
+//   }
+// }
