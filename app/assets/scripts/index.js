@@ -30,7 +30,7 @@ window.onload = () => {
       screen.orientation.lock('landscape')
       document.querySelector('fullscreen-dialog').innerHTML = ''
     }
-    window.exitHandler = () => {
+    window.onExitHandler = () => {
       console.log(document.webkitIsFullScreen)
       if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
         document.querySelector('fullscreen-dialog').innerHTML = `
@@ -43,12 +43,12 @@ window.onload = () => {
         `
       }
       document.body.append(document.createElement('fullscreen-dialog'))
-      document.addEventListener('fullscreenchange', window.exitHandler, false)
-      document.addEventListener('mozfullscreenchange', window.exitHandler, false)
-      document.addEventListener('MSFullscreenChange', window.exitHandler, false)
-      document.addEventListener('webkitfullscreenchange', window.exitHandler, false)
-      window.exitHandler()
+      document.addEventListener('fullscreenchange', window.onExitHandler, false)
+      document.addEventListener('mozfullscreenchange', window.onExitHandler, false)
+      document.addEventListener('MSFullscreenChange', window.onExitHandler, false)
+      document.addEventListener('webkitfullscreenchange', window.onExitHandler, false)
     }
+    window.onExitHandler()
   }
 }
 
