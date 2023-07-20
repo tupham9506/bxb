@@ -23,6 +23,34 @@ window.onload = () => {
 
   window.addEventListener('resize', onResize)
   onResize()
+
+  window.$reqFullScreen = () => {
+    document.body.requestFullscreen()
+    screen.orientation.lock('landscape')
+    document.querySelector('fullscreen-dialog').innerHTML = ''
+  }
+
+  if (window.$helper.isMobile) {
+    document.body.append(document.createElement('fullscreen-dialog'))
+    document.addEventListener('fullscreenchange', window.exitHandler, false)
+    document.addEventListener('mozfullscreenchange', window.exitHandler, false)
+    document.addEventListener('MSFullscreenChange', window.exitHandler, false)
+    document.addEventListener('webkitfullscreenchange', window.exitHandler, false)
+    window.exitHandler()
+  }
+  window.exitHandler = () => {
+    console.log(document.webkitIsFullScreen)
+    if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+      document.querySelector('fullscreen-dialog').innerHTML = `
+        <div class="dialog">
+          <div class="dialog-content card">
+            <div>Bạn đã thoát chế độ toàn màn hình</div>
+            <button type="button" class="btn full" onclick="window.$reqFullScreen()">Bật toàn màn hình</button>
+          </div>
+        </div>
+      `
+    }
+  }
 }
 
 function onResize() {
