@@ -21,9 +21,7 @@ window.onload = () => {
     window.onSetup()
   }
 
-  // window.addEventListener('resize', onResize)
-  // onResize()
-  if (window.$helper.isMobile) {
+  if (window.$helper.isMobile()) {
     window.$reqFullScreen = () => {
       if (document.body.requestFullscreen) {
         document.body.requestFullscreen()
@@ -34,12 +32,11 @@ window.onload = () => {
       } else if (document.body.msRequestFullscreen) {
         document.body.msRequestFullscreen()
       } else {
-        console.log('Not support fullscreen!')
+        alert('Trình duyệt của bạn không hỗ trợ. Vui lòng sử dụng chrome phiên bản mới nhất.')
         return false
       }
-
-      screen.orientation.lock('landscape')
       document.querySelector('fullscreen-dialog').innerHTML = ''
+      screen.orientation.lock('landscape')
     }
     window.onExitHandler = () => {
       if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
@@ -61,9 +58,3 @@ window.onload = () => {
     window.onExitHandler()
   }
 }
-
-// function onResize() {
-//   if (window.innerHeight > window.innerWidth) {
-//     alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
-//   }
-// }
