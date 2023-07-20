@@ -23,10 +23,21 @@ window.onload = () => {
 
   // window.addEventListener('resize', onResize)
   // onResize()
-
   if (window.$helper.isMobile) {
     window.$reqFullScreen = () => {
-      document.body.requestFullscreen()
+      if (document.body.requestFullscreen) {
+        document.body.requestFullscreen()
+      } else if (document.body.webkitRequestFullscreen) {
+        document.body.webkitRequestFullscreen()
+      } else if (document.body.mozRequestFullScreen) {
+        document.body.mozRequestFullScreen()
+      } else if (document.body.msRequestFullscreen) {
+        document.body.msRequestFullscreen()
+      } else {
+        console.log('Not support fullscreen!')
+        return false
+      }
+
       screen.orientation.lock('landscape')
       document.querySelector('fullscreen-dialog').innerHTML = ''
     }
