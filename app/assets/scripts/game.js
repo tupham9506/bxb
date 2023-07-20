@@ -66,8 +66,8 @@ window.buildGame = () => {
   window.$40_point = 40 * window.$point
   window.$50_point = 50 * window.$point
   window.$100_point = 100 * window.$point
-  document.querySelector('.ctrl-container').style.width = `${window.$20_point}px`
-  document.querySelector('.ctrl-container').style.height = `${window.$20_point}px`
+  document.querySelector('.ctrl-container').style.width = `${window.$30_point}px`
+  document.querySelector('.ctrl-container').style.height = `${window.$30_point}px`
   document.querySelector('#touch').style.width = `${window.$10_point}px`
   document.querySelector('#touch').style.height = `${window.$10_point}px`
   for (let i in window.$players) {
@@ -82,19 +82,19 @@ window.buildGame = () => {
 
     if (isMe) {
       document.querySelector('.skill-ctrl').innerHTML = `
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s1')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s1')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
           <span>J</span>
           <img src="components/balls/${window.$players[i].ballId}/s1-icon.svg">
         </div>
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s2')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s2')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
           <span>K</span>
           <img src="components/balls/${window.$players[i].ballId}/s2-icon.svg">
         </div>
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s3')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s3')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
           <span>L</span>
           <img src="components/balls/${window.$players[i].ballId}/s3-icon.svg">
         </div>
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s4')" style="width: ${window.$10_point}px; height: ${window.$10_point}px;">
+        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s4')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
           <span>O</span>
           <img src="components/balls/${window.$players[i].ballId}/s4-icon.svg">
         </div>
