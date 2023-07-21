@@ -1,17 +1,18 @@
 // eslint-disable-next-line no-unused-vars
-function Ball1(config = {}) {
+function Ball4(config = {}) {
+  const namespace = 'components/balls/4/'
   const self = this
-  const namespace = 'components/balls/1/'
 
   // Ball info
-  self.hp = 1000
-  self.hpTotal = 1000
-  self.speed = window.$point
+  self.hp = 1150
+  self.hpTotal = 1200
+  self.speed = window.$point * 1.1
   self.direct = config.direct
   self.isLockMove = false
   self.isLockSkill = false
   self.ctrl = {}
   self.command = {}
+  self.isAtk = false
   self.config = config
 
   // Ball container
@@ -21,20 +22,27 @@ function Ball1(config = {}) {
   self.container.y = config.y || 0
 
   const ballTexture = window.PIXI.Texture.from(namespace + 'ball.svg')
-  const s1Texture = window.PIXI.Texture.from(namespace + 's1.svg')
-  const s2Texture = window.PIXI.Texture.from(namespace + 's2.svg')
-  const s3Texture = window.PIXI.Texture.from(namespace + 's3.svg')
-  const s3EndTexture = window.PIXI.Texture.from(namespace + 's3-end.svg')
-  const s4Texture = window.PIXI.Texture.from(namespace + 's4.svg')
 
   self.ball = new window.PIXI.Sprite(ballTexture)
   self.ball.width = window.$10_point
   self.ball.height = window.$10_point
   self.ball.anchor.set(0.5)
 
-  self.container.addChild(self.ball)
+  const weaponTexture = window.PIXI.Texture.from(namespace + 'weapon.svg')
+  self.weapon = new window.PIXI.Sprite(weaponTexture)
+  self.weapon.width = window.$3_point
+  self.weapon.height = window.$15_point
+  self.weapon.x = +self.ball.width / 2
+  self.weapon.anchor.set(0.5, 0)
 
+  const s1Texture = window.PIXI.Texture.from(namespace + 's1.svg')
+  const s2Texture = window.PIXI.Texture.from(namespace + 's2.svg')
+  const s4Texture = window.PIXI.Texture.from(namespace + 's4.svg')
+
+  self.container.addChild(self.ball)
+  self.container.addChild(self.weapon)
   window.$helper.buildArrow(self)
+
   self.text = null
   let currentKey = null
   let move = {
@@ -112,15 +120,21 @@ function Ball1(config = {}) {
     right: new window.PIXI.Ticker().add(self.ctrl.right)
   }
 
-  self.ctrl.move = data => {
-    if (self.isLockMove) {
-      for (let i in move) {
-        if (move[i]) {
-          moveTicker[i].stop()
-          move[i] = false
-        }
+  function stopMove() {
+    for (let i in move) {
+      if (move[i]) {
+        moveTicker[i].stop()
+        move[i] = false
       }
-      return false
+    }
+  }
+
+  self.ctrl.move = data => {
+    if (!self.isAtk) {
+      self.buildWeaponPosition()
+    }
+    if (self.isLockMove) {
+      return stopMove()
     }
 
     if (data.name === 'stop') {
@@ -143,6 +157,7 @@ function Ball1(config = {}) {
     self.container.x = data.x * window.$point
     self.container.y = data.y * window.$point
     self.direct = data.direct
+    self.buildWeaponPosition()
   }
 
   self.command.lockMove = data => {
@@ -170,9 +185,16 @@ function Ball1(config = {}) {
   }
 
   self.command.hp = data => {
-    self.hp += data.hp
+    let hp = data.hp
+
+    // Reduce damage
+    if (hp < 0 && s2.isRun) {
+      hp = hp - Math.round((hp * s2.defPercent) / 100)
+    }
+    self.hp += hp
     self.command.text({
-      title: data.hp,
+      title: data.title || hp,
+      time: data.time,
       style: {
         fill: '0xFF0000',
         fontSize: data.isCrit ? window.$4_point : window.$2_point
@@ -189,26 +211,49 @@ function Ball1(config = {}) {
     }
   }
 
+  self.buildWeaponPosition = () => {
+    const position = window.$helper.positionWeaponByDirect(self.direct, self.ball)
+    self.weapon.angle = position.angle
+    self.weapon.x = position.x
+    self.weapon.y = position.y
+  }
+
   self.buildHp = () => {
     const hpSelector = document.querySelector(`[user-id="${config.id}"] .hp-bar-remain`)
     if (hpSelector) {
       hpSelector.style.width = (self.hp / self.hpTotal) * 100 + '%'
-      // hpSelector.innerHTML = self.hp
     }
   }
 
   // S1
   const s1 = {
-    src: window.$helper.sprite(s1Texture, window.$10_point, window.$5_point),
+    src: window.$helper.sprite(s1Texture, window.$15_point, window.$8_point),
     ticker: new window.PIXI.Ticker(),
+    ticker2: new window.PIXI.Ticker(),
+    sound: window.$helper.sound(`${namespace}s1.mp3`),
     isEnabled: true,
-    atk: 100,
-    speed: window.$1_point,
-    sound: window.$helper.sound(`${namespace}s1.mp3`)
+    atk: 110,
+    speed: 5,
+    speed2: window.$1_point * 1.5,
+    range2: window.$30_point,
+    delay2: 100,
+    angle: 75
   }
 
-  s1.ticker.add(delta => {
-    if (!s1.isHit) {
+  s1.ticker.add(() => {
+    self.weapon.angle += s1.currentDirect[1] * s1.speed
+    s1.currentRange += s1.speed
+
+    if (s1.currentRange >= s1.angle) {
+      self.isAtk = false
+      self.isLockMove = false
+      self.buildWeaponPosition()
+      s1.ticker.stop()
+    }
+  })
+
+  s1.ticker2.add(delta => {
+    if (config.isMe && !s1.isHit) {
       for (let i in window.$players) {
         if (i === config.id) continue
         s1.isHit = window.$helper.isHit(s1.src, window.$players[i].ball.ball)
@@ -224,17 +269,15 @@ function Ball1(config = {}) {
       }
     }
 
-    const speed = s1.speed * delta
-    s1.src[s1.currentDirect[0]] = s1.src[s1.currentDirect[0]] + s1.currentDirect[1] * speed
-    s1.currentRange += speed
+    const speed2 = s1.speed2 * delta
+    s1.src[s1.currentDirect[0]] = s1.src[s1.currentDirect[0]] + s1.currentDirect[1] * speed2
+    s1.currentRange2 += speed2
 
-    if (s1.isHit || s1.currentRange >= window.$50_point) {
+    if (s1.currentRange2 >= s1.range2) {
       window.$pixi.stage.removeChild(s1.src)
       s1.sound.stop()
-      if (s1.currentRange >= window.$50_point) {
-        s1.isEnabled = true
-        s1.ticker.stop()
-      }
+      s1.isEnabled = true
+      s1.ticker2.stop()
     }
   })
 
@@ -248,74 +291,85 @@ function Ball1(config = {}) {
         name: 's1'
       })
       s1.isEnabled = false
-      self.lockSkillSpam()
+      self.isAtk = true
+      self.isLockMove = true
       window.$runSkill('s1')
     }
-    s1.sound.play()
 
     s1.currentDirect = [...self.direct]
+    s1.currentRange = 0
+    s1.currentRange2 = 0
+    s1.isHit = false
     const anchor = window.$helper.anchor(self.container, self.ball, s1.currentDirect, s1.src)
     s1.src.x = anchor.x
     s1.src.y = anchor.y
     s1.src.angle = window.$helper.angleByDirect(s1.currentDirect, s1.src)
-    window.$pixi.stage.addChild(s1.src)
-
-    s1.currentRange = 0
-    s1.isHit = false
     s1.ticker.start()
+
+    setTimeout(() => {
+      s1.sound.play()
+      window.$pixi.stage.addChild(s1.src)
+      s1.ticker2.start()
+    }, s1.delay2)
   }
 
-  self.ctrl.s1 = self.command.s1 = () => {
+  self.command.s1 = self.ctrl.s1 = () => {
     s1.ctrl()
   }
 
   // S2
   const s2 = {
-    src: window.$helper.sprite(s2Texture, window.$10_point, window.$10_point),
+    src: window.$helper.sprite(s2Texture, window.$20_point, window.$10_point),
     ticker: new window.PIXI.Ticker(),
+    ticker2: new window.PIXI.Ticker(),
+    sound: window.$helper.sound(`${namespace}s2.mp3`),
     isEnabled: true,
-    atk: 50,
-    speed: window.$1_point,
-    range: window.$100_point,
-    effectTime: 1000,
-    sound: window.$helper.sound(`${namespace}s2.mp3`)
+    atk: 200,
+    speed: 4,
+    speed2: window.$1_point * 1.5,
+    range2: window.$50_point,
+    delay2: 500,
+    angle: 90
   }
 
-  s2.ticker.add(delta => {
-    if (!s2.isHit) {
+  s2.ticker.add(() => {
+    self.weapon.angle += s2.currentDirect[1] * s2.speed
+    s2.currentRange += s2.speed
+
+    if (s2.currentRange >= s2.angle) {
+      self.isAtk = false
+      self.isLockMove = false
+      self.buildWeaponPosition()
+      s2.ticker.stop()
+    }
+  })
+
+  s2.ticker2.add(delta => {
+    if (config.isMe && !s2.isHit) {
       for (let i in window.$players) {
         if (i === config.id) continue
         s2.isHit = window.$helper.isHit(s2.src, window.$players[i].ball.ball)
 
         if (config.isMe && s2.isHit) {
           window.$command({
-            name: 'lockMove',
-            effectTime: s2.effectTime,
-            id: i
-          })
-          window.$command({
             name: 'hp',
             hp: -s2.atk,
-            id: i,
-            title: 'Bị Đóng Băng',
-            time: s2.effectTime
+            id: i
           })
           break
         }
       }
     }
 
-    const speed = s2.speed * delta
-    s2.src[s2.currenDirect[0]] = s2.src[s2.currenDirect[0]] + s2.currenDirect[1] * speed
+    const speed2 = s2.speed2 * delta
+    s2.src[s2.currentDirect[0]] = s2.src[s2.currentDirect[0]] + s2.currentDirect[1] * speed2
+    s2.currentRange2 += speed2
 
-    s2.currentRange += speed
-    if (s2.isHit || s2.currentRange >= s2.range) {
+    if (s2.currentRange2 >= s2.range2) {
       window.$pixi.stage.removeChild(s2.src)
       s2.sound.stop()
-      if (s2.currentRange >= window.$50_point) {
-        s2.isEnabled = true
-        s2.ticker.stop()
-      }
+      s2.isEnabled = true
+      s2.ticker2.stop()
     }
   })
 
@@ -329,92 +383,42 @@ function Ball1(config = {}) {
         name: 's2'
       })
       s2.isEnabled = false
+      self.isAtk = true
+      self.isLockMove = true
       self.lockSkillSpam()
       window.$runSkill('s2')
     }
 
-    s2.sound.play()
-
-    s2.currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s2.currenDirect, s2.src)
+    s2.currentDirect = [...self.direct]
+    s2.currentRange = 0
+    s2.currentRange2 = 0
+    s2.isHit = false
+    const anchor = window.$helper.anchor(self.container, self.ball, s2.currentDirect, s2.src)
     s2.src.x = anchor.x
     s2.src.y = anchor.y
-    s2.src.angle = window.$helper.angleByDirect(s2.currenDirect)
-    window.$pixi.stage.addChild(s2.src)
-
-    s2.currentRange = 0
-    s2.isHit = false
+    s2.src.angle = window.$helper.angleByDirect(s2.currentDirect, s2.src)
     s2.ticker.start()
+
+    setTimeout(() => {
+      s2.sound.play()
+      window.$pixi.stage.addChild(s2.src)
+      s2.ticker2.start()
+    }, s2.delay2)
   }
 
-  self.ctrl.s2 = self.command.s2 = () => {
+  self.command.s2 = self.ctrl.s2 = () => {
     s2.ctrl()
   }
 
-  // S3
+  // S2
   const s3 = {
-    src: window.$helper.sprite(s3Texture, window.$10_point, window.$10_point),
-    endSrc: window.$helper.sprite(s3EndTexture, window.$10_point, window.$10_point),
-    ticker: new window.PIXI.Ticker(),
-    tickerEnd: new window.PIXI.Ticker(),
     isEnabled: true,
-    atk: 150,
-    speed: window.$1_point,
-    range: window.$40_point,
-    endSize: window.$20_point,
-    endTime: 1,
-    sound: window.$helper.sound(`${namespace}s3-end.mp3`)
+    sound: window.$helper.sound(`${namespace}s3.mp3`),
+    isRun: false,
+    delay: 3000
   }
 
-  s3.ticker.add(delta => {
-    const speed = s3.speed * delta
-    s3.src[s3.currenDirect[0]] = s3.src[s3.currenDirect[0]] + s3.currenDirect[1] * speed
-    s3.src.rotation += 0.1
-
-    s3.currentRange += speed
-    if (s3.currentRange >= s3.range) {
-      window.$pixi.stage.removeChild(s3.src)
-      s3.endSrc.x = s3.src.x
-      s3.endSrc.y = s3.src.y
-      s3.ticker.stop()
-      s3.tickerEnd.start()
-      s3.sound.play()
-    }
-  })
-
-  s3.tickerEnd.add(delta => {
-    window.$pixi.stage.addChild(s3.endSrc)
-    if (!s3.isHit) {
-      for (let i in window.$players) {
-        if (i === config.id) continue
-        s3.isHit = window.$helper.isHit(s3.endSrc, window.$players[i].ball.ball)
-        if (config.isMe && s3.isHit) {
-          window.$command({
-            name: 'hp',
-            hp: -s3.atk,
-            id: i
-          })
-          break
-        }
-      }
-    }
-
-    s3.endSrc.width += window.$1_point * delta
-    s3.endSrc.height += window.$1_point * delta
-
-    if (s3.endSrc.width >= s3.endSize) {
-      s3.tickerEnd.stop()
-
-      setTimeout(() => {
-        window.$pixi.stage.removeChild(s3.endSrc)
-        s3.endSrc.width = window.$10_point
-        s3.endSrc.height = window.$10_point
-        s3.isEnabled = true
-      }, s3.endTime * 1000)
-    }
-  })
-
-  s3.ctrl = () => {
+  self.ctrl.s3 = () => {
     if (config.isMe) {
       if (!s3.isEnabled) return
       if (self.isLockSkill) return
@@ -423,34 +427,31 @@ function Ball1(config = {}) {
         id: window.id,
         name: 's3'
       })
-      s3.isEnabled = false
-      self.lockSkillSpam()
+
       window.$runSkill('s3')
     }
+    s3.sound.play()
+    self.isLockMove = false
+    s3.isEnabled = false
 
-    s3.currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s3.currenDirect, s3.src)
-    s3.src.x = anchor.x
-    s3.src.y = anchor.y
-    s3.src.angle = window.$helper.angleByDirect(s3.currenDirect)
-    window.$pixi.stage.addChild(s3.src)
-
-    s3.currentRange = 0
-    s3.isHit = false
-    s3.ticker.start()
+    setTimeout(() => {
+      s3.isEnabled = true
+    }, s3.delay)
   }
 
-  self.ctrl.s3 = self.command.s3 = () => {
-    s3.ctrl()
+  self.command.s3 = () => {
+    self.ctrl.s3()
   }
 
   // S4
   const s4 = {
-    src: window.$helper.sprite(s4Texture, window.$30_point, window.$10_point),
+    src: window.$helper.sprite(s4Texture, window.$point, window.$point),
     ticker: new window.PIXI.Ticker(),
     isEnabled: true,
     atk: 300,
-    speed: window.$2_point,
+    speed: 0.1,
+    max: 2.5,
+    timeout: 1000,
     sound: window.$helper.sound(`${namespace}s4.mp3`)
   }
 
@@ -470,13 +471,17 @@ function Ball1(config = {}) {
       }
     }
     const speed = s4.speed * delta
-    s4.src[s4.currenDirect[0]] = s4.src[s4.currenDirect[0]] + s4.currenDirect[1] * speed
+    s4.src.scale.x += speed
+    s4.src.scale.y += speed
     s4.currentRange += speed
-    if (s4.isHit || s4.currentRange >= 2 * window.$100_point) {
-      window.$pixi.stage.removeChild(s4.src)
-      if (s4.currentRange >= window.$100_point) {
-        s4.ticker.stop()
-      }
+    s4.src.angle += speed
+
+    if (s4.currentRange >= s4.max) {
+      s4.ticker.stop()
+      setTimeout(() => {
+        self.container.removeChild(s4.src)
+        self.isLockMove = false
+      }, s4.timeout)
     }
   })
 
@@ -492,16 +497,15 @@ function Ball1(config = {}) {
       s4.isEnabled = false
       self.lockSkillSpam()
       window.$runSkill('s4')
+      self.isLockMove = true
     }
 
     s4.sound.play()
 
-    s4.currenDirect = [...self.direct]
-    const anchor = window.$helper.anchor(self.container, self.ball, s4.currenDirect, s4.src)
-    s4.src.x = anchor.x
-    s4.src.y = anchor.y
-    s4.src.angle = window.$helper.angleByDirect(s4.currenDirect)
-    window.$pixi.stage.addChild(s4.src)
+    s4.src.x = 0
+    s4.src.y = 0
+    self.ball.anchor.set(0.5)
+    self.container.addChild(s4.src)
     s4.currentRange = 0
     s4.isHit = false
     s4.ticker.start()
@@ -513,13 +517,12 @@ function Ball1(config = {}) {
 
   self.lockSkillSpam = () => {
     self.isLockSkill = true
-    self.isLockMove = true
     setTimeout(() => {
       self.isLockSkill = false
-      self.isLockMove = false
-    }, 200)
+    }, 300)
   }
 
+  self.buildWeaponPosition()
   self.buildHp()
   window.$helper.showArrow(self)
 }

@@ -1,12 +1,24 @@
 window.$helper = {
-  angleByDirect: direct => {
+  angleByDirect: (direct, ctx) => {
     if (direct[0] === 'x') {
-      if (direct[1] === 1) return 0
-      return -180
+      if (direct[1] === 1) {
+        if (ctx && ctx.scale.x < 0) ctx.scale.x *= -1
+        if (ctx && ctx.scale.y < 0) ctx.scale.y *= -1
+        return 0
+      }
+      if (ctx && ctx.scale.x > 0) ctx.scale.x *= -1
+      if (ctx && ctx.scale.y < 0) ctx.scale.y *= -1
+      return 0
     }
 
-    if (direct[1] === -1) return -90
-    return 90
+    if (direct[1] === 1) {
+      if (ctx && ctx.scale.x < 0) ctx.scale.x *= -1
+      if (ctx && ctx.scale.y < 0) ctx.scale.y *= -1
+      return 90
+    }
+    if (ctx && ctx.scale.x < 0) ctx.scale.x *= -1
+    if (ctx && ctx.scale.y > 0) ctx.scale.y *= -1
+    return -90
   },
   positionWeaponByDirect: (direct, element) => {
     if (direct[0] === 'x') {

@@ -66,10 +66,10 @@ window.buildGame = () => {
   window.$40_point = 40 * window.$point
   window.$50_point = 50 * window.$point
   window.$100_point = 100 * window.$point
-  document.querySelector('.ctrl-container').style.width = `${window.$30_point}px`
-  document.querySelector('.ctrl-container').style.height = `${window.$30_point}px`
-  document.querySelector('#touch').style.width = `${window.$10_point}px`
-  document.querySelector('#touch').style.height = `${window.$10_point}px`
+  // document.querySelector('.ctrl-container').style.width = `${window.$30_point}px`
+  // document.querySelector('.ctrl-container').style.height = `${window.$30_point}px`
+  // document.querySelector('#touch').style.width = `${window.$10_point}px`
+  // document.querySelector('#touch').style.height = `${window.$10_point}px`
   for (let i in window.$players) {
     const isMe = window.id === i
     if (window.$players[i].isKey) {
@@ -82,22 +82,22 @@ window.buildGame = () => {
 
     if (isMe) {
       document.querySelector('.skill-ctrl').innerHTML = `
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s1')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
+        <button type="button" class="btn skill-ctrl-item s1" ontouchstart="window.window.$commandSkill('s1')" style="width: ${window.$8_point}px; height: ${window.$8_point}px; min-width: ${window.$8_point}px;">
           <span>J</span>
           <img src="components/balls/${window.$players[i].ballId}/s1-icon.svg">
-        </div>
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s2')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
+        </button>
+        <button type="button" class="btn skill-ctrl-item s2" ontouchstart="window.window.$commandSkill('s2')" style="width: ${window.$8_point}px; height: ${window.$8_point}px; min-width: ${window.$8_point}px;">
           <span>K</span>
           <img src="components/balls/${window.$players[i].ballId}/s2-icon.svg">
-        </div>
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s3')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
+        </button>
+        <button type="button" class="btn skill-ctrl-item s3" ontouchstart="window.window.$commandSkill('s3')" style="width: ${window.$8_point}px; height: ${window.$8_point}px; min-width: ${window.$8_point}px;">
           <span>L</span>
           <img src="components/balls/${window.$players[i].ballId}/s3-icon.svg">
-        </div>
-        <div class="skill-ctrl-item" ontouchstart="window.window.$commandSkill('s4')" style="width: ${window.$15_point}px; height: ${window.$15_point}px;">
+        </button>
+        <button type="button" class="btn skill-ctrl-item s4" ontouchstart="window.window.$commandSkill('s4')" style="width: ${window.$8_point}px; height: ${window.$8_point}px; min-width: ${window.$8_point}px;">
           <span>O</span>
           <img src="components/balls/${window.$players[i].ballId}/s4-icon.svg">
-        </div>
+        </button>
       `
     }
 
@@ -161,82 +161,82 @@ window.buildGame = () => {
     }
   })
 
-  document.querySelector('#touch').addEventListener(
-    'touchstart',
-    event => {
-      const touch = event.changedTouches[0]
-      window.moveX = touch.clientX
-      window.moveY = touch.clientY
-    },
-    false
-  )
+  // document.querySelector('#touch').addEventListener(
+  //   'touchstart',
+  //   event => {
+  //     const touch = event.changedTouches[0]
+  //     window.moveX = touch.clientX
+  //     window.moveY = touch.clientY
+  //   },
+  //   false
+  // )
 
-  document.querySelector('#touch').addEventListener(
-    'touchmove',
-    event => {
-      const touch = event.changedTouches[0]
-      console.log(touch.clientX, window.moveX)
-      const xChange = Math.abs(touch.clientX - window.moveX)
-      const yChange = Math.abs(touch.clientY - window.moveY)
-      const currentMoveX = window.moveX
-      const currentMoveY = window.moveY
-      window.moveX = touch.clientX
-      window.moveY = touch.clientY
-      const ctrlContainerElement = document.querySelector('.ctrl-container')
+  // document.querySelector('#touch').addEventListener(
+  //   'touchmove',
+  //   event => {
+  //     const touch = event.changedTouches[0]
+  //     console.log(touch.clientX, window.moveX)
+  //     const xChange = Math.abs(touch.clientX - window.moveX)
+  //     const yChange = Math.abs(touch.clientY - window.moveY)
+  //     const currentMoveX = window.moveX
+  //     const currentMoveY = window.moveY
+  //     window.moveX = touch.clientX
+  //     window.moveY = touch.clientY
+  //     const ctrlContainerElement = document.querySelector('.ctrl-container')
 
-      if (xChange > yChange) {
-        if (touch.clientX > currentMoveX) {
-          ctrlContainerElement.style['justify-content'] = 'flex-end'
-          ctrlContainerElement.style['align-items'] = 'center'
-          window.$commandMoveStop('left')
-          window.$commandMoveStop('down')
-          window.$commandMoveStop('up')
-          return window.$commandMove('right')
-        }
-        if (touch.clientX < currentMoveX) {
-          ctrlContainerElement.style['justify-content'] = 'flex-start'
-          ctrlContainerElement.style['align-items'] = 'center'
-          window.$commandMoveStop('right')
-          window.$commandMoveStop('down')
-          window.$commandMoveStop('up')
-          return window.$commandMove('left')
-        }
-      }
+  //     if (xChange > yChange) {
+  //       if (touch.clientX > currentMoveX) {
+  //         ctrlContainerElement.style['justify-content'] = 'flex-end'
+  //         ctrlContainerElement.style['align-items'] = 'center'
+  //         window.$commandMoveStop('left')
+  //         window.$commandMoveStop('down')
+  //         window.$commandMoveStop('up')
+  //         return window.$commandMove('right')
+  //       }
+  //       if (touch.clientX < currentMoveX) {
+  //         ctrlContainerElement.style['justify-content'] = 'flex-start'
+  //         ctrlContainerElement.style['align-items'] = 'center'
+  //         window.$commandMoveStop('right')
+  //         window.$commandMoveStop('down')
+  //         window.$commandMoveStop('up')
+  //         return window.$commandMove('left')
+  //       }
+  //     }
 
-      if (touch.clientY > currentMoveY) {
-        ctrlContainerElement.style['justify-content'] = 'center'
-        ctrlContainerElement.style['align-items'] = 'flex-end'
-        window.$commandMoveStop('left')
-        window.$commandMoveStop('right')
-        window.$commandMoveStop('up')
-        return window.$commandMove('down')
-      }
+  //     if (touch.clientY > currentMoveY) {
+  //       ctrlContainerElement.style['justify-content'] = 'center'
+  //       ctrlContainerElement.style['align-items'] = 'flex-end'
+  //       window.$commandMoveStop('left')
+  //       window.$commandMoveStop('right')
+  //       window.$commandMoveStop('up')
+  //       return window.$commandMove('down')
+  //     }
 
-      if (touch.clientY < currentMoveY) {
-        ctrlContainerElement.style['justify-content'] = 'center'
-        ctrlContainerElement.style['align-items'] = 'start'
-        window.$commandMoveStop('left')
-        window.$commandMoveStop('down')
-        window.$commandMoveStop('right')
-        return window.$commandMove('up')
-      }
-    },
-    false
-  )
+  //     if (touch.clientY < currentMoveY) {
+  //       ctrlContainerElement.style['justify-content'] = 'center'
+  //       ctrlContainerElement.style['align-items'] = 'start'
+  //       window.$commandMoveStop('left')
+  //       window.$commandMoveStop('down')
+  //       window.$commandMoveStop('right')
+  //       return window.$commandMove('up')
+  //     }
+  //   },
+  //   false
+  // )
 
-  document.querySelector('#touch').addEventListener(
-    'touchend',
-    () => {
-      const ctrlContainerElement = document.querySelector('.ctrl-container')
-      ctrlContainerElement.style['justify-content'] = 'center'
-      ctrlContainerElement.style['align-items'] = 'center'
-      window.$commandMoveStop('left')
-      window.$commandMoveStop('down')
-      window.$commandMoveStop('right')
-      window.$commandMoveStop('up')
-    },
-    false
-  )
+  // document.querySelector('#touch').addEventListener(
+  //   'touchend',
+  //   () => {
+  //     const ctrlContainerElement = document.querySelector('.ctrl-container')
+  //     ctrlContainerElement.style['justify-content'] = 'center'
+  //     ctrlContainerElement.style['align-items'] = 'center'
+  //     window.$commandMoveStop('left')
+  //     window.$commandMoveStop('down')
+  //     window.$commandMoveStop('right')
+  //     window.$commandMoveStop('up')
+  //   },
+  //   false
+  // )
 }
 
 window.$commandMove = key => {
@@ -272,6 +272,14 @@ window.$goRoomPage = () => {
 
 //   return 'Are you sure want to LOGOUT the session ?'
 // }
+
+window.$runSkill = skill => {
+  const skillElement = document.querySelector(`.skill-ctrl .${skill}`)
+  skillElement.classList.add('active')
+  setTimeout(() => {
+    skillElement.classList.remove('active')
+  }, 500)
+}
 
 window.openDialog = title => {
   document.querySelector('#dialog').innerHTML = `

@@ -60,7 +60,7 @@ html, body {
   background-size: cover;
   background-position: center;
   background-size: cover;
-  overflow: auto;
+  overflow: hidden;
 }
 
 a {

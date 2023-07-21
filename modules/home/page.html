@@ -22,7 +22,7 @@
       <a href="/story" class="btn">Story</a>
       <a href="https://www.youtube.com/watch?v=V1Pl8CzNzCw" target="_blank" class="btn">Thoát</a>
     </div>
-    <a href="/version" class="version">Version 1.02 - 2023.07.08</a>
+    <a href="/version" class="version">Version 1.03 - 2023.07.22</a>
     <div class="link">
       <a href="https://github.com/tupham9506/bxb" target="_blank" class="github"></a>
     </div>
@@ -52,15 +52,15 @@
         true
       )
 
-      window.addEventListener('resize', onResize)
-      onResize()
+      // window.addEventListener('resize', onResize)
+      // onResize()
     }
 
-    function onResize () {
-      if (window.innerHeight > window.innerWidth) {
-        alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
-      }
-    }
+    // function onResize () {
+    //   if (window.innerHeight > window.innerWidth) {
+    //     alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
+    //   }
+    // }
 
     async function start () {
       const res = await (await fetch('/api/start', {

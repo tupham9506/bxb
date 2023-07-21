@@ -48,7 +48,7 @@ function Ball3(config = {}) {
 
   // Control define
   self.ctrl.left = delta => {
-    if (self.isLockMove || currentKey !== 'left') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'left') return
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     self.container.x -= delta * self.speed
     self.direct = ['x', -1]
@@ -63,7 +63,7 @@ function Ball3(config = {}) {
   }
 
   self.ctrl.right = delta => {
-    if (self.isLockMove || currentKey !== 'right') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'right') return
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
     self.container.x += delta * self.speed
     self.direct = ['x', +1]
@@ -78,7 +78,7 @@ function Ball3(config = {}) {
   }
 
   self.ctrl.up = delta => {
-    if (self.isLockMove || currentKey !== 'up') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'up') return
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
     self.container.y -= delta * self.speed
     self.direct = ['y', -1]
@@ -93,7 +93,7 @@ function Ball3(config = {}) {
   }
 
   self.ctrl.down = delta => {
-    if (self.isLockMove || currentKey !== 'down') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'down') return
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
     self.container.y += delta * self.speed
     self.direct = ['y', +1]
@@ -148,9 +148,9 @@ function Ball3(config = {}) {
   }
 
   self.command.lockMove = data => {
-    self.isLockMove = true
+    self.isSuperLockMove = true
     setTimeout(() => {
-      self.isLockMove = false
+      self.isSuperLockMove = false
     }, data.effectTime)
   }
 
@@ -257,6 +257,7 @@ function Ball3(config = {}) {
         name: 's1'
       })
       s1.isEnabled = false
+      window.$runSkill('s1')
     }
     clearTimeout(s1.timeoutId)
     s1.timeoutId = null
@@ -266,7 +267,7 @@ function Ball3(config = {}) {
     const anchor = window.$helper.anchor(self.container, self.ball, s1.currentDirect, s1.src)
     s1.src.x = anchor.x
     s1.src.y = anchor.y
-    s1.src.angle = window.$helper.angleByDirect(s1.currentDirect)
+    s1.src.angle = window.$helper.angleByDirect(s1.currentDirect, s1.src)
     window.$pixi.stage.addChild(s1.src)
 
     s1.currentRange = 0
@@ -297,6 +298,7 @@ function Ball3(config = {}) {
         id: window.id,
         name: 's2'
       })
+      window.$runSkill('s2')
     }
 
     if (!s1.timeoutId) return
@@ -355,6 +357,7 @@ function Ball3(config = {}) {
         id: window.id,
         name: 's3'
       })
+      window.$runSkill('s3')
     }
 
     self.container.x = self.oldX
@@ -426,6 +429,7 @@ function Ball3(config = {}) {
         name: 's4'
       })
       s4.isEnabled = false
+      window.$runSkill('s4')
     }
 
     s4.sound.play()
@@ -435,6 +439,15 @@ function Ball3(config = {}) {
 
   self.command.s4 = self.ctrl.s4 = () => {
     s4.ctrl()
+  }
+
+  self.lockSkillSpam = () => {
+    self.isLockSkill = true
+    self.isLockMove = true
+    setTimeout(() => {
+      self.isLockSkill = false
+      self.isLockMove = false
+    }, 200)
   }
 
   self.buildHp()

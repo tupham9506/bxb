@@ -53,7 +53,7 @@ function Ball2(config = {}) {
 
   // Control define
   self.ctrl.left = delta => {
-    if (self.isLockMove || currentKey !== 'left') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'left') return
     if (self.container.x - window.$point - self.ball.width / 2 <= 0) return
     self.container.x -= delta * self.speed
     self.direct = ['x', -1]
@@ -68,7 +68,7 @@ function Ball2(config = {}) {
   }
 
   self.ctrl.right = delta => {
-    if (self.isLockMove || currentKey !== 'right') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'right') return
     if (self.container.x + window.$point + self.ball.width / 2 >= window.$pixi.screen.width) return
     self.container.x += delta * self.speed
     self.direct = ['x', +1]
@@ -83,7 +83,7 @@ function Ball2(config = {}) {
   }
 
   self.ctrl.up = delta => {
-    if (self.isLockMove || currentKey !== 'up') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'up') return
     if (self.container.y - window.$point - self.ball.height / 2 <= 0) return
     self.container.y -= delta * self.speed
     self.direct = ['y', -1]
@@ -98,7 +98,7 @@ function Ball2(config = {}) {
   }
 
   self.ctrl.down = delta => {
-    if (self.isLockMove || currentKey !== 'down') return
+    if (self.isLockMove || self.isSuperLockMove || currentKey !== 'down') return
     if (self.container.y + window.$point + self.ball.height / 2 >= window.$pixi.screen.height) return
     self.container.y += delta * self.speed
     self.direct = ['y', +1]
@@ -160,9 +160,9 @@ function Ball2(config = {}) {
   }
 
   self.command.lockMove = data => {
-    self.isLockMove = true
+    self.isSuperLockMove = true
     setTimeout(() => {
-      self.isLockMove = false
+      self.isSuperLockMove = false
     }, data.effectTime)
   }
 
@@ -221,7 +221,6 @@ function Ball2(config = {}) {
     const hpSelector = document.querySelector(`[user-id="${config.id}"] .hp-bar-remain`)
     if (hpSelector) {
       hpSelector.style.width = (self.hp / self.hpTotal) * 100 + '%'
-      // hpSelector.innerHTML = self.hp
     }
   }
 
@@ -233,7 +232,7 @@ function Ball2(config = {}) {
     atk: 100,
     speed: 7,
     angle: 75,
-    endTime: 500
+    endTime: 400
   }
 
   s1.ticker.add(delta => {
@@ -284,6 +283,7 @@ function Ball2(config = {}) {
       s1.isEnabled = false
       self.isAtk = true
       self.isLockMove = true
+      window.$runSkill('s1')
     }
 
     s1.sound.play()
@@ -321,6 +321,7 @@ function Ball2(config = {}) {
       })
       stopMove()
       self.isLockMove = true
+      window.$runSkill('s2')
     }
     s2.sound.play()
     s2.isRun = true
@@ -377,7 +378,7 @@ function Ball2(config = {}) {
         name: 's4'
       })
       s4.isEnabled = false
-      s2.isEnabled = false
+      window.$runSkill('s4')
     }
     s4.isRun = true
     s4.sound.play()

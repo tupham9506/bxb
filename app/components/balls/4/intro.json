@@ -1,0 +1,33 @@
+{
+  "id": 4,
+  "name": "Vũ",
+  "nickname": "Kẻ sở hữu thanh kiếm năng lượng",
+  "range": 4,
+  "hp": 5,
+  "speed": 6,
+  "strength": 7,
+  "image": "components/balls/4/ball.svg",
+  "tip": "",
+  "skills": [
+    {
+      "name": "Tia năng Lượng A",
+      "image": "components/balls/4/s1-icon.svg",
+      "description": "Vận sức mạnh và chém về phía trước, phóng ra 1 tia năng lượng gây 110 sát thương"
+    },
+    {
+      "name": "Tia năng Lượng S",
+      "image": "components/balls/4/s2-icon.svg",
+      "description": "Tích tụ năng lượng trong 1 khoảng thời gian, sau đó bắn ra 1 tia năng lượng lớn và đi xa hơn. Gây 200 sát thương"
+    },
+    {
+      "name": "Lá chắn năng lượng",
+      "image": "components/balls/4/s3-icon.svg",
+      "description": "Nội tại: Vũ được bao bọc bởi năng lượng sẽ bị mất 50 máu khi bắt đầu trận. Đổi lại hắn được tăng tốc độ chạy vĩnh viễn. Kích hoạt: loại bỏ mọi hiệu ứng khống chế."
+    },
+    {
+      "name": "Vụ nổ năng lượng",
+      "image": "components/balls/4/s4-icon.svg",
+      "description": "Tạo ra 1 vụ nổ gây 300 sát thương xung quanh."
+    }
+  ]
+}

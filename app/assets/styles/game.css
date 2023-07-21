@@ -134,7 +134,12 @@ bxb canvas {
 .skill-ctrl-item {
   position: relative;
   border: 1px solid var(--color-blue);
-  background-color: #fff;
+  border-radius: unset;
+}
+
+.skill-ctrl-item.active {
+  background-color: var(--color-white-light);
+  border: 1px solid var(--color-red);
 }
 
 .skill-ctrl-item * {
@@ -153,6 +158,8 @@ bxb canvas {
 }
 
 .skill-ctrl-item img {
-  left: 0;
-  top: 0;
+  left: 5px;
+  top: 5px;
+  bottom: 5px;
+  right: 5px;
 }
