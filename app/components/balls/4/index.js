@@ -431,7 +431,7 @@ function Ball4(config = {}) {
       window.$runSkill('s3')
     }
     s3.sound.play()
-    self.isLockMove = false
+    self.isSuperLockMove = false
     s3.isEnabled = false
 
     setTimeout(() => {
