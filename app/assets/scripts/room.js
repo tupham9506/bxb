@@ -21,7 +21,7 @@ window.onSetup = () => {
             <div class="user-name">${item.roomName}</div>
             <div class="user-number"><img src="assets/images/character.svg"><div>${
               Object.keys(item.players).length || 0
-            } / 2</div></div>
+            }</div></div>
           </div>
         `
       })

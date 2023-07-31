@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ball x balL</title>
+    <link rel="stylesheet" href="libs/animate/animate.css">
+    <link rel="stylesheet" href="assets/styles/common.css">
+    <link rel="stylesheet" href="assets/styles/base.css">
+    <link rel="stylesheet" href="assets/styles/index.css">
+</head>
+<body>
+<div class="loading-bg"></div>
+<div>
+
+</div>
+<div class="flex flex-column flex-center-x h-100 relative">
+    <div class="header">
+        <div class="title">Ball x balL</div>
+    </div>
+    <div class="menu">
+        <input type="text" class="input text-center" placeholder="Nhập tên của Khứa" id="userName">
+        <a href="#" class="btn red" href="" onclick="start(); return false;">Bắt đầu</a>
+        <a href="/story" class="btn">Story</a>
+        <a href="https://www.youtube.com/watch?v=V1Pl8CzNzCw" target="_blank" class="btn">Thoát</a>
+    </div>
+    <a href="/version" class="version">Version 1.03 - 2023.07.22</a>
+    <div class="link">
+        <a href="https://github.com/tupham9506/bxb" target="_blank" class="github"></a>
+    </div>
+</div>
+
+<script src="assets/scripts/helper.js"></script>
+<script>
+  var id;
+  var userName;
+
+  window.onload = async () => {
+    id = $helper.getCookie('id');
+    if (id) {
+      const res = await (await fetch('/api/user')).json();
+      if (res.data) {
+        document.querySelector('#userName').value = res.data.userName;
+      }
+    }
+    document.querySelector('.loading-bg').remove()
+
+    var audio = new Audio('/assets/sounds/click.mp3')
+    document.body.addEventListener(
+      'click',
+      function () {
+        audio.play()
+      },
+      true
+    )
+
+    // window.addEventListener('resize', onResize)
+    // onResize()
+  }
+
+  // function onResize () {
+  //   if (window.innerHeight > window.innerWidth) {
+  //     alert('Vui lòng xoay ngang thiết bị của bạn để bắt đầu trò chơi')
+  //   }
+  // }
+
+  async function start () {
+    const res = await (await fetch('/api/start', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        userName: document.querySelector('#userName').value
+      })
+    })).json();
+    window.location.href = '/room'
+  }
+</script>
+</body>
+</html>

@@ -43,7 +43,7 @@ module.exports = async app => {
 
     socket.on('JOIN_ROOM', async data => {
       const room = await Room.findOne({ _id: data.id })
-      if (!room || Object.keys(room.players).length >= 2) return false
+      if (!room) return false
       room.players[socket.auth.id] = {
         id: socket.auth.id,
         userName: socket.auth.userName
