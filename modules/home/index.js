@@ -3,6 +3,10 @@ const User = require('./../../models/user')
 const mongoose = require('mongoose')
 
 module.exports = app => {
+  app.get('/hello', function (_req, res) {
+    res.send('Hello world')
+  })
+
   app.get('/', function (_req, res) {
     res.sendFile(path.join(__dirname + '/page.html'))
   })

@@ -26,6 +26,7 @@ const init = async () => {
   await require('./config/database')()
   global.io.use(require('./middlewares/socketAuth'))
   // Fetch modules
+  
   require('./modules/home')(app)
   require('./modules/version')(app)
   require('./modules/story')(app)
