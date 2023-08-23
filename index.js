@@ -25,14 +25,14 @@ app.use(express.static(__dirname + '/app/pages', { extensions: ['html'] }))
 const init = async () => {
   await require('./config/database')()
   global.io.use(require('./middlewares/socketAuth'))
-  // Fetch modules
-  
+  // Fetch module
   require('./modules/home')(app)
   require('./modules/version')(app)
   require('./modules/story')(app)
   require('./modules/room')(app)
   require('./modules/select')(app)
   require('./modules/game')(app)
+  require('./modules/lunch')(app)
 }
 
 init()
