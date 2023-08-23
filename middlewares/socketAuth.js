@@ -1,14 +1,22 @@
 const User = require('./../models/user')
+const jwt = require('jsonwebtoken')
 
 module.exports = async (socket, next) => {
-  const auth = socket.handshake.auth
-  if (!auth || !auth.id) return next(new Error('Unauthorized!'))
+  const token = socket.handshake.auth.token
+
+  try {
+    var auth = jwt.verify(token, process.env.JWT_SECRET)
+  } catch (err) {
+    return next(new Error('Unauthorized!'))
+  }
 
   const user = await User.findOne({
     _id: auth.id
   })
 
-  socket.auth = user
   if (!user) return next(new Error('Unauthorized!'))
+
+  socket.auth = user
+
   next()
 }

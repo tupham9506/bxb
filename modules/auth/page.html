@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball x balL</title>
+  <link rel="stylesheet" href="libs/animate/animate.css">
+  <link rel="stylesheet" href="assets/styles/common.css">
+  <link rel="stylesheet" href="assets/styles/base.css">
+  <link rel="stylesheet" href="assets/styles/index.css">
+</head>
+<body>
+  <div class="flex flex-column flex-center-x h-100 relative">
+    <div>
+      <form action="login" method="POST" class="flex flex-row flex-center">
+        <input type="text" class="input text-center" placeholder="Tên khứa" id="userName">
+        <input type="password" class="input text-center" placeholder="Mật khẩu" id="password">
+        <button class="btn red" href="" onclick="login(); return false;">Đăng nhập hoặc đăng ký</button>
+      </form>
+    </div>
+  </div>
+  <script src="assets/scripts/helper.js"></script>
+  <script>
+    async function login () {
+      const res = await (await fetch('/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          userName: document.querySelector('#userName').value,
+          password: document.querySelector('#password').value,
+        })
+      })).json();
+      if (!res.success) {
+        alert(res.message || 'Lỗi không xác định.')
+      }
+
+      $helper.setCookie('token', res.token);
+      window.location.href = '/lunches'
+    }
+  </script>
+</body>
+</html>

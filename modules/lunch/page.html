@@ -8,23 +8,91 @@
   <link rel="stylesheet" href="libs/animate/animate.css">
   <link rel="stylesheet" href="assets/styles/common.css">
   <link rel="stylesheet" href="assets/styles/base.css">
-  <link rel="stylesheet" href="assets/styles/index.css">
+  <link rel="stylesheet" href="assets/styles/lunch.css">
 </head>
 <body>
-  <div class="flex flex-column flex-center-x h-100 relative">
+  <div class="flex">
+    <div id="menu">
 
+    </div>
+    <div id="order">
+  
+    </div>
   </div>
   
+  <script src="libs/socket.io/socket.io.min.js"></script>
   <script src="assets/scripts/helper.js"></script>
+  <script src="assets/scripts/index.js"></script>
+
   <script>
-    window.onload = async () => {
-      await getMenu()
+    window.onSetup = () => {
+      window.socket.on('connect', () => {
+        window.socket.on('MENU', data => {
+          window.buildMenu(data)
+        })
+
+        window.socket.on('ORDER', data => {
+          window.buildOrder(data)
+        })
+      })
     }
-    async function getMenu () {
-      const res = await (await fetch('/lunches/menu', {
-        method: 'GET'
-      })).json();
-      console.log(res)
+
+    window.buildMenu = (data) => {
+      let template = '';
+      for(let item of data) {
+        template += `<div class="card p-10 menu-item">
+          <div class="menu-image"><img src="${item.image}"></div>
+            <div class="item-name">${item.name}</div>
+            <div class="item-price">
+              ${$helper.currency(item.price)}
+            </div>
+            <button type="button" class="btn" onclick="order('${item._id}')">Đặt</button>
+        </div>
+        `
+      }
+      document.querySelector('#menu').innerHTML = template
+    }
+
+    window.order = (id) => {
+      window.socket.emit('ORDER', {
+        id
+      })
+    }
+
+    window.buildOrder = (data) => {
+      console.log(data)
+      let template = '';
+      let total = 0
+      let freeShip = 15000
+
+      for(let item of data.lunch_order_items) {
+        template += `<div class="card p-10 order-item">
+            <div>
+              <div class="order-name">${item.lunch_menu?.name || 'Unknown'}</div>
+              <div class="user-name">${item.user?.userName || 'Unknown'}</div>
+            </div>
+            <div class="order-price">
+              ${$helper.currency(item.lunch_menu?.price || 0)}
+            </div>
+        </div>
+        `
+        total += item.lunch_menu?.price || 0;
+      }
+
+      total -= freeShip
+      for(let item of data.promos) {
+        template += `
+          <div class="card p-10 order-item">
+            ${item.title} <span class="text-right">-${$helper.currency(item.price)}<span>
+          </div>
+        `
+      }
+      template += `
+        <div class="card p-10 order-item">
+          Tổng <span class="text-right">${$helper.currency(total)}<span>
+        </div>
+      `
+      document.querySelector('#order').innerHTML = template
     }
   </script>
 </body>

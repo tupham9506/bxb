@@ -33,6 +33,7 @@ const init = async () => {
   require('./modules/select')(app)
   require('./modules/game')(app)
   require('./modules/lunch')(app)
+  require('./modules/auth')(app)
 }
 
 init()

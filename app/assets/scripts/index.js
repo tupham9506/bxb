@@ -1,10 +1,9 @@
 window.onload = () => {
-  console.log('1')
-  window.id = window.$helper.getCookie('id')
+  window.token = window.$helper.getCookie('token')
   window.socket = window.io('ws://' + window.location.host, {
     reconnectionDelayMax: 10000,
     auth: {
-      id: window.id
+      token: window.token
     }
   })
   var audio = new Audio('/assets/sounds/click.mp3')

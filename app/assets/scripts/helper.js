@@ -226,5 +226,8 @@ window.$helper = {
         check = true
     })(navigator.userAgent || navigator.vendor || window.opera)
     return check
+  },
+  currency: number => {
+    return number.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')
   }
 }

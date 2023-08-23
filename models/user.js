@@ -5,6 +5,7 @@ module.exports = global.database.model(
   defineSchema({
     id: String,
     userName: String,
+    password: String,
     roomId: String
   })
 )
