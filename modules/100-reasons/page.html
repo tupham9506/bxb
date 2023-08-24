@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball x balL</title>
+  <link rel="stylesheet" href="libs/animate/animate.css">
+  <link rel="stylesheet" href="assets/styles/common.css">
+  <link rel="stylesheet" href="assets/styles/base.css">
+  <link rel="stylesheet" href="assets/styles/100-reasons.css">
+</head>
+<body>
+  <div class="flex flex-center">
+    <div>
+      <h2 class="title">100 reasons to be alive</h2>
+      <div id="reasons" class="card">
+
+      </div>
+    </div>
+  </div>
+  <script src="assets/scripts/helper.js"></script>
+  <script>
+    window.onload = () => {
+      getReasons();
+    }
+    async function getReasons () {
+      const res = await (await fetch('/api/100-reasons', {
+        method: 'get',
+      })).json();
+      window.buildReasons(res)
+    }
+
+    window.buildReasons = (data) => {
+      let template = '';
+      let total = 0
+      let freeShip = 15000
+
+      for(let item of data) {
+        template += `<div class=" p-10 reason-item">
+            ${item.id}. <span class="reason-content">${item.content}</span>
+        </div>
+        `
+      }
+
+      document.querySelector('#reasons').innerHTML = template
+    }
+  </script>
+</body>
+</html>

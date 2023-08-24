@@ -1,0 +1,21 @@
+html, body {
+    overflow: auto;
+}
+
+.title {
+    color: #FFFFFF;
+    padding: 20px;
+    text-align: center;
+}
+#reasons {
+    padding: 20px;
+    margin: 20px;
+    background: #FFFFFF;
+}
+
+.reason-item {
+}
+
+.reason-content {
+    text-transform: capitalize;
+}
