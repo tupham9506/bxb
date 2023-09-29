@@ -16,6 +16,7 @@
     "cookie-parser": "1.4.6",
     "crypto-js": "^4.1.1",
     "dotenv": "16.1.4",
+    "elliptic": "^6.5.4",
     "express": "4.18.2",
     "jsonwebtoken": "^9.0.1",
     "moment": "^2.29.4",

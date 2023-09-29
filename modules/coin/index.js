@@ -1,94 +1,36 @@
-const SHA256 = require('sha256')
-const chain = []
+const { Blockchain, Transaction } = require('../../helpers/bxbBlock')
+const EC = require('elliptic').ec
+const ec = new EC('secp256k1')
+// Your private key goes here
+const myKey = ec.keyFromPrivate('test-private')
+
+// From that we can calculate your public key (which doubles as your wallet address)
+const myWalletAddress = myKey.getPublic('hex')
 
 module.exports = app => {
   app.get('/coin', async (req, res) => {
-    if (!chain.length) {
-      chain.push(createGenesisBlock())
-    }
+    // Create new instance of Blockchain class
+    const coin = new Blockchain()
 
-    const transaction = createNewTransaction('1', 'A', 'B')
-    createNewBlock(transaction)
-    console.log(isChainValid())
-    return res.json(chain)
+    // Mine first block
+    coin.minePendingTransactions(myWalletAddress)
+
+    // Create a transaction & sign it with your key
+    const tx1 = new Transaction(myWalletAddress, 'address2', 100)
+    tx1.sign(myKey)
+    coin.addTransaction(tx1)
+
+    // Mine block
+    coin.minePendingTransactions(myWalletAddress)
+
+    // Create second transaction
+    const tx2 = new Transaction(myWalletAddress, 'address1', 50)
+    tx2.sign(myKey)
+    coin.addTransaction(tx2)
+
+    // Mine block
+    coin.minePendingTransactions(myWalletAddress)
+
+    return res.json({ coin, balance: coin.getBalanceOfAddress(myWalletAddress), myWalletAddress })
   })
-}
-
-function createGenesisBlock() {
-  return {
-    index: 1,
-    timestamp: Date.now(),
-    data: [],
-    nonce: 0,
-    hash: 'hash',
-    prevHash: 'prevHash'
-  }
-}
-
-function getLastBlock() {
-  return chain[chain.length - 1]
-}
-
-function generateHash(prevHash, timestamp, data) {
-  let hash = ''
-  let nonce = 0
-
-  while (hash.substring(0, 3) !== '000') {
-    nonce++
-    hash = SHA256(prevHash + timestamp + JSON.stringify(data) + nonce).toString()
-  }
-
-  return { hash, nonce }
-}
-
-function createNewTransaction(amount, sender, recipient) {
-  return {
-    amount,
-    sender,
-    recipient
-  }
-}
-
-function createNewBlock(data) {
-  const timestamp = Date.now()
-  const prevHash = getLastBlock().hash
-  const generatedHash = generateHash(prevHash, timestamp, data)
-
-  const newBlock = {
-    index: chain.length + 1,
-    timestamp,
-    data,
-    nonce: generatedHash.nonce,
-    hash: generatedHash.hash,
-    prevHash
-  }
-
-  chain.push(newBlock)
-
-  return newBlock
-}
-
-function isChainValid() {
-  for (let i = 1; i < chain.length; i++) {
-    const currentBlock = chain[i]
-    const previousBlock = chain[i - 1]
-
-    // Recalculate the hash of the block and see if it matches up.
-    // This allows us to detect changes to a single block
-    if (currentBlock.hash !== generateHash(currentBlock.hash)) {
-      return false
-    }
-
-    // Check if this block actually points to the previous block (hash)
-    if (currentBlock.prevHash !== previousBlock.hash) {
-      return false
-    }
-  }
-  // Check the genesis block
-  if (chain[0] !== createGenesisBlock()) {
-    return false
-  }
-
-  // If we managed to get here, the chain is valid!
-  return true
 }
