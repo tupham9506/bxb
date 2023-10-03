@@ -1,36 +1,121 @@
-const { Blockchain, Transaction } = require('../../helpers/bxbBlock')
-const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
-// Your private key goes here
-const myKey = ec.keyFromPrivate('test-private')
+const { BallCoin } = require('../../helpers/ballCoin')
+const _ = require('lodash')
 
-// From that we can calculate your public key (which doubles as your wallet address)
-const myWalletAddress = myKey.getPublic('hex')
-
-module.exports = app => {
+const userA = (module.exports = app => {
   app.get('/coin', async (req, res) => {
-    // Create new instance of Blockchain class
-    const coin = new Blockchain()
+    if (req.query.step == 1) {
+      return res.json(step1())
+    }
 
-    // Mine first block
-    coin.minePendingTransactions(myWalletAddress)
+    if (req.query.step == 2) {
+      return res.json(step2())
+    }
 
-    // Create a transaction & sign it with your key
-    const tx1 = new Transaction(myWalletAddress, 'address2', 100)
-    tx1.sign(myKey)
-    coin.addTransaction(tx1)
+    // User A nhận 100 coin từ việc sáng tạo Ball Coin
+    let block = userA.createBlock([
+      {
+        from: '',
+        to: 'AddressA',
+        amount: 1000
+      }
+    ])
 
-    // Mine block
-    coin.minePendingTransactions(myWalletAddress)
+    // Publish thông tin lên mạng rằng tôi đã tạo 1 chuỗi mới
+    // User B nhận thông tin có 1 khối mới được tạo
+    const userBMinted = userB.mint(block, 'AddressB')
+    const userCMinted = userC.mint(block, 'AddressC')
 
-    // Create second transaction
-    const tx2 = new Transaction(myWalletAddress, 'address1', 50)
-    tx2.sign(myKey)
-    coin.addTransaction(tx2)
+    userA.addToChain(userBMinted)
+    userB.addToChain(userBMinted)
+    userC.addToChain(userBMinted)
 
-    // Mine block
-    coin.minePendingTransactions(myWalletAddress)
+    result = [
+      'User A nhận 1000 coin từ việc sáng tạo Ball Coin',
+      [
+        {
+          from: '',
+          to: 'AddressA',
+          amount: 1000
+        }
+      ],
+      'User B, C nhận được thông tin rằng có 1 transaction mới sẽ thực hiện mint',
+      'Kết quả mint của user B:',
+      userBMinted,
+      'Kết quả mint của user C:',
+      userCMinted,
+      'Người chiến thắng: user B. User A, B, C kiểm tra tính hợp lệ của Block sau đó sẽ quyết định xem có thêm Block mà B đã đào vào chuỗi.',
+      'userA',
+      userA.chain,
+      'userB',
+      userB.chain,
+      'userC',
+      userC.chain
+    ]
 
-    return res.json({ coin, balance: coin.getBalanceOfAddress(myWalletAddress), myWalletAddress })
+    if (req.query.step == 2) {
+      return res.send(result)
+    }
   })
+})
+
+function step1() {
+  // 1. Tạo chuỗi block
+  const baseCoin = new BallCoin()
+  const userA = new BallCoin()
+  const userB = new BallCoin()
+  const userC = new BallCoin()
+
+  return {
+    baseCoin,
+    userA: userA.chain,
+    userB: userB.chain,
+    userC: userC.chain
+  }
+}
+
+function step2() {
+  // User A nhận 100 coin từ việc sáng tạo Ball Coin
+  let block = userA.createBlock([
+    {
+      from: '',
+      to: 'AddressA',
+      amount: 1000
+    }
+  ])
+
+  // Publish thông tin lên mạng rằng tôi đã tạo 1 chuỗi mới
+  // User B nhận thông tin có 1 khối mới được tạo
+  const userBMinted = userB.mint(block, 'AddressB')
+  const userCMinted = userC.mint(block, 'AddressC')
+
+  userA.addToChain(userBMinted)
+  userB.addToChain(userBMinted)
+  userC.addToChain(userBMinted)
+
+  result = [
+    'User A nhận 1000 coin từ việc sáng tạo Ball Coin',
+    [
+      {
+        from: '',
+        to: 'AddressA',
+        amount: 1000
+      }
+    ],
+    'User B, C nhận được thông tin rằng có 1 transaction mới sẽ thực hiện mint',
+    'Kết quả mint của user B:',
+    userBMinted,
+    'Kết quả mint của user C:',
+    userCMinted,
+    'Người chiến thắng: user B. User A, B, C kiểm tra tính hợp lệ của Block sau đó sẽ quyết định xem có thêm Block mà B đã đào vào chuỗi.',
+    'userA',
+    userA.chain,
+    'userB',
+    userB.chain,
+    'userC',
+    userC.chain
+  ]
+
+  if (req.query.step == 2) {
+    return res.send(result)
+  }
 }
