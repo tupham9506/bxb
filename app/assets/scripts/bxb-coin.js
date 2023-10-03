@@ -1,7 +1,7 @@
 function BxbCoin() {
   this.mempool = []
   this.chain = []
-  this.difficulty = 4
+  this.difficulty = 5
   this.bonus = 100
   this.init = () => {
     const block = {
@@ -18,7 +18,19 @@ function BxbCoin() {
     return window.CryptoJS.SHA256(block.prevHash + block.time + JSON.stringify(block.data) + block.nonce).toString()
   }
 
+  this.sign = transaction => {
+    return window.walletSecret
+      .sign(window.CryptoJS.SHA256(transaction.from, transaction.to, transaction.amount).toString(), 'base64')
+      .toDER('hex')
+  }
+
   this.createBlock = data => {
+    for (let transaction of data) {
+      if (transaction.from) {
+        transaction.sign = this.sign(transaction)
+      }
+    }
+
     return {
       prevHash: this.chain[this.chain.length - 1].hash,
       time: Date.now(),

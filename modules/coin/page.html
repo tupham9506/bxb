@@ -66,8 +66,8 @@
     window.bxbCoin = null
     function createWallet () {
       const ec = new elliptic.ec('secp256k1')
-      const walletSecret = ec.keyFromPrivate(document.querySelector('#privateKey').value)
-      window.walletAddress = walletSecret.getPublic('hex')
+      window.walletSecret = ec.keyFromPrivate(document.querySelector('#privateKey').value)
+      window.walletAddress = window.walletSecret.getPublic('hex')
       document.querySelector('#publicKey').value = window.walletAddress
     }
 
