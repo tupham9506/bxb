@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ball x balL</title>
+  <link rel="stylesheet" href="libs/animate/animate.css">
+  <link rel="stylesheet" href="assets/styles/common.css">
+  <link rel="stylesheet" href="assets/styles/base.css">
+  <link rel="stylesheet" href="assets/styles/coin.css">
+</head>
+<body>
+  <div class="flex flex-row">
+    <div class="left-content">
+      <h2>My Wallet</h2><br>
+      <div>
+        <input type="text" class="input" id="privateKey" placeholder="Khóa bí mật">
+        <button type="button" class="btn" onclick="createWallet()">Tạo Ví</button>
+        <input type="text" class="input" id="publicKey" placeholder="Địa chỉ ví của bạn">
+        <textarea id="blockContent">[{
+  "from": "",
+  "to": "",
+  "amount": 0
+}]</textarea>
+        <button type="button" class="btn" onclick="createBlock()">Tạo block</button>
+      </div>
+    </div>
+    <div class="center-content">
+      <h2>Mempool</h2><br>
+      <div id="mempool"></div>
+    </div>
+    <div class="right-content">
+      <h2>bxbCoin Blockchain</h2><br>
+      <div id="blockchain"></div>
+    </div>
+  </div>
+
+  <script src="libs/elliptic/elliptic.min.js"></script>
+  <script src="libs/crypto-js/crypto-js.min.js"></script>
+  <script src="libs/lodash/lodash.min.js"></script>
+  <script src="libs/socket.io/socket.io.min.js"></script>
+  <script src="assets/scripts/helper.js"></script>
+  <script src="assets/scripts/index.js"></script>
+  <script src="assets/scripts/bxb-coin.js"></script>
+  <script>
+    window.walletAddress = '';
+
+    window.onSetup = () => {
+      window.bxbCoin = new BxbCoin()
+      window.bxbCoin.init()
+      buildBlockchain ()
+
+      window.socket.on('NEW_BLOCK', (data) => {
+        window.bxbCoin.mempool.push(data);
+        buildMempool();
+      });
+
+      window.socket.on('MINT_BLOCK', (data) => {
+        window.bxbCoin.addToChain(data)
+        buildBlockchain()
+        buildMempool();
+      });
+    }
+
+    window.bxbCoin = null
+    function createWallet () {
+      const ec = new elliptic.ec('secp256k1')
+      const walletSecret = ec.keyFromPrivate(document.querySelector('#privateKey').value)
+      window.walletAddress = walletSecret.getPublic('hex')
+      document.querySelector('#publicKey').value = window.walletAddress
+    }
+
+    function buildBlockchain () {
+      let blockChainTemplate = ''
+      for (let block of window.bxbCoin.chain) {
+        blockChainTemplate += `<textarea>${JSON.stringify(block, null, 4)}</textarea>`
+      }
+      document.querySelector('#blockchain').innerHTML = blockChainTemplate
+    }
+
+    function buildMempool() {
+      let mempoolTemplate = ''
+      for (let block of window.bxbCoin.mempool) {
+        mempoolTemplate += `<textarea>${JSON.stringify(block, null, 4)}</textarea><button type="button" class="btn" onclick="mint('${block.prevHash}')">Mint</button>`
+      }
+      document.querySelector('#mempool').innerHTML = mempoolTemplate
+    }
+
+    function createBlock() {
+      const data = window.bxbCoin.createBlock(JSON.parse(document.querySelector('#blockContent').value));
+      window.socket.emit('NEW_BLOCK', data)
+    }
+
+    function mint (prevHash) {
+      const block = window.bxbCoin.mempool.find(item => item.prevHash === prevHash)
+      const data = window.bxbCoin.mint(block, window.walletAddress);
+      window.socket.emit('MINT_BLOCK', data)
+    }
+    
+  </script>
+</body>
+</html>
