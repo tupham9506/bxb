@@ -11,27 +11,42 @@
   <link rel="stylesheet" href="assets/styles/coin.css">
 </head>
 <body>
-  <div class="flex flex-row">
-    <div class="left-content">
-      <h2>My Wallet</h2><br>
-      <div>
-        <input type="text" class="input" id="privateKey" placeholder="Khóa bí mật">
-        <button type="button" class="btn" onclick="createWallet()">Tạo Ví</button>
-        <input type="text" class="input" id="publicKey" placeholder="Địa chỉ ví của bạn">
-        <textarea id="blockContent">[{
+  <div class="board">
+    <table class="w-100 mb-10">
+      <tr>
+        <td>Độ khó </td>
+        <td><input type="text" class="input" value="5" id="difficulty" onchange="updateDifficulty()"/></td>
+      </tr>
+      <tr class="create-wallet">
+        <td>Tạo ví </td>
+        <td>
+          <input type="text" class="input" id="privateKey" placeholder="Khóa bí mật">
+          <button type="button" class="btn" id="createWallet" onclick="createWallet()">Tạo</button>
+        </td>
+      </tr>
+      <tr class="your-wallet none">
+        <td>Địa chỉ ví của bạn </td>
+        <td>
+          <input type="text" class="input w-100" id="publicKey">
+        </td>
+      </tr>
+    </table>
+    <div>
+      <textarea id="blockContent">[{
   "from": "",
   "to": "",
   "amount": 0
 }]</textarea>
-        <button type="button" class="btn" onclick="createBlock()">Tạo block</button>
-      </div>
+      <button type="button" class="btn" onclick="createBlock()">Tạo block</button>
     </div>
-    <div class="center-content">
-      <h2>Mempool</h2><br>
+  </div>
+  <div class="flex flex-row">
+    <div class="left-content">
+      <h2>Danh sách chờ mint</h2><br>
       <div id="mempool"></div>
     </div>
     <div class="right-content">
-      <h2>bxbCoin Blockchain</h2><br>
+      <h2>Blockchain</h2><br>
       <div id="blockchain"></div>
     </div>
   </div>
@@ -45,6 +60,8 @@
   <script src="assets/scripts/bxb-coin.js"></script>
   <script>
     window.walletAddress = '';
+    window.bxbCoin = null
+    window.isExpand = false;
 
     window.onSetup = () => {
       window.bxbCoin = new BxbCoin()
@@ -63,18 +80,29 @@
       });
     }
 
-    window.bxbCoin = null
+    function updateDifficulty () {
+      window.bxbCoin.difficulty = +document.querySelector('#difficulty').value
+    }
+
     function createWallet () {
       const ec = new elliptic.ec('secp256k1')
       window.walletSecret = ec.keyFromPrivate(document.querySelector('#privateKey').value)
       window.walletAddress = window.walletSecret.getPublic('hex')
+      document.querySelector('.create-wallet').style.display = 'none'
+      document.querySelector('.your-wallet').style.display = 'table-row'
       document.querySelector('#publicKey').value = window.walletAddress
     }
 
     function buildBlockchain () {
       let blockChainTemplate = ''
       for (let block of window.bxbCoin.chain) {
-        blockChainTemplate += `<textarea>${JSON.stringify(block, null, 4)}</textarea>`
+        blockChainTemplate += `
+          <div class="block-item" ondblclick="expand(this)">
+            <div>Prev Hash: ${block.prevHash.substring(0, 10)}...</div>
+            <div>Hash: ${block.hash.substring(0, 10)}...</div>
+            <textarea class="textarea-expand none">${JSON.stringify(block, null, 2)}</textarea>
+          </div>
+        `
       }
       document.querySelector('#blockchain').innerHTML = blockChainTemplate
     }
@@ -82,9 +110,24 @@
     function buildMempool() {
       let mempoolTemplate = ''
       for (let block of window.bxbCoin.mempool) {
-        mempoolTemplate += `<textarea>${JSON.stringify(block, null, 4)}</textarea><button type="button" class="btn" onclick="mint('${block.prevHash}')">Mint</button>`
+        mempoolTemplate += `
+          <div class="block-item" ondblclick="expand(this)">
+            <div>Prev Hash: ${block.prevHash.substring(0, 10)}...</div>
+            <div>Hash: ${(block.hash || '').substring(0, 10)}...</div>
+            <textarea class="textarea-expand none">${JSON.stringify(block, null, 2)}</textarea>
+          </div>
+        <button type="button" class="btn" onclick="mint('${block.prevHash}')">Mint</button>`
       }
       document.querySelector('#mempool').innerHTML = mempoolTemplate
+    }
+
+    function expand (element, isExpanded) {
+      window.isExpand = !window.isExpand;
+      if (window.isExpand) {
+        element.querySelector('textarea').classList.remove('none')
+      } else {
+        element.querySelector('textarea').classList.add('none')
+      }
     }
 
     function createBlock() {
