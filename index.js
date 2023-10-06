@@ -35,6 +35,7 @@ const init = async () => {
   require('./modules/lunch')(app)
   require('./modules/auth')(app)
   require('./modules/100-reasons')(app)
+  require('./modules/coin')(app)
 }
 
 init()

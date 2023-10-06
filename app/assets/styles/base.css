@@ -189,6 +189,10 @@ input:focus-visible {
   border-radius: 10px;
 }
 
+.table td {
+  padding: 5px;
+}
+
 ::placeholder {
   color: var(--color-white);
   opacity: 0.5;
