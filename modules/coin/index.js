@@ -7,6 +7,7 @@ module.exports = app => {
 
   global.io.on('connection', async socket => {
     socket.join('COIN_CHANNEL')
+    socket.emit('AUTH', socket.auth)
     socket.on('NEW_BLOCK', data => {
       global.io.in('COIN_CHANNEL').emit('NEW_BLOCK', data)
     })

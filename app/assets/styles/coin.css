@@ -1,6 +1,8 @@
 body {
   color: #FFF;
   overflow: auto;
+  font-family: Arial;
+  font-size: 20px;
 }
 .board {
   padding: 20px;

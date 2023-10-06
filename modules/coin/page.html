@@ -12,7 +12,10 @@
 </head>
 <body>
   <div class="board">
-    <table class="w-100 mb-10">
+    <table class="w-100 mb-10 table">
+      <tr>
+        <td colspan="2"><h2 id="username"></h2></td>
+      </tr>
       <tr>
         <td>Độ khó </td>
         <td><input type="text" class="input" value="5" id="difficulty" onchange="updateDifficulty()"/></td>
@@ -37,7 +40,7 @@
   "to": "",
   "amount": 0
 }]</textarea>
-      <button type="button" class="btn" onclick="createBlock()">Tạo block</button>
+      <button type="button" class="btn" onclick="createTransaction()">Tạo transaction</button>
     </div>
   </div>
   <div class="flex flex-row">
@@ -64,12 +67,16 @@
     window.isExpand = false;
 
     window.onSetup = () => {
+      window.socket.on('AUTH', (data) => {
+        document.querySelector('#username').innerHTML = data.userName
+      });
+
       window.bxbCoin = new BxbCoin()
       window.bxbCoin.init()
       buildBlockchain ()
 
       window.socket.on('NEW_BLOCK', (data) => {
-        window.bxbCoin.mempool.push(data);
+        window.bxbCoin.createBlock(data);
         buildMempool();
       });
 
@@ -98,8 +105,8 @@
       for (let block of window.bxbCoin.chain) {
         blockChainTemplate += `
           <div class="block-item" ondblclick="expand(this)">
-            <div>Prev Hash: ${block.prevHash.substring(0, 10)}...</div>
-            <div>Hash: ${block.hash.substring(0, 10)}...</div>
+            <div>Prev Hash: ${block.prevHash ? block.prevHash.substring(0, 10) + '...' : ''}</div>
+            <div>Hash: ${block.hash ? block.hash.substring(0, 10) + '...' : ''}</div>
             <textarea class="textarea-expand none">${JSON.stringify(block, null, 2)}</textarea>
           </div>
         `
@@ -112,8 +119,8 @@
       for (let block of window.bxbCoin.mempool) {
         mempoolTemplate += `
           <div class="block-item" ondblclick="expand(this)">
-            <div>Prev Hash: ${block.prevHash.substring(0, 10)}...</div>
-            <div>Hash: ${(block.hash || '').substring(0, 10)}...</div>
+            <div>Prev Hash: ${block.prevHash ? block.prevHash.substring(0, 10) + '...' : ''}</div>
+            <div>Hash: ${block.hash ? block.hash.substring(0, 10) + '...' : ''}</div>
             <textarea class="textarea-expand none">${JSON.stringify(block, null, 2)}</textarea>
           </div>
         <button type="button" class="btn" onclick="mint('${block.prevHash}')">Mint</button>`
@@ -130,8 +137,8 @@
       }
     }
 
-    function createBlock() {
-      const data = window.bxbCoin.createBlock(JSON.parse(document.querySelector('#blockContent').value));
+    function createTransaction() {
+      const data = window.bxbCoin.createTransaction(JSON.parse(document.querySelector('#blockContent').value));
       window.socket.emit('NEW_BLOCK', data)
     }
 

@@ -1,8 +1,8 @@
 function BxbCoin() {
-  this.mempool = []
-  this.chain = []
-  this.difficulty = 5
-  this.reward = 100
+  this.mempool = [] // Danh sách các block đang chờ xác nhận
+  this.chain = [] // Chuỗi Blockchain
+  this.difficulty = 5 // Độ khó của bài toán
+  this.reward = 100 // Phần thưởng cho mỗi lần đào
 
   /**
    * Tạo khối genesis
@@ -27,7 +27,7 @@ function BxbCoin() {
   }
 
   /**
-   * Đặt chữ ký cho transaction
+   * Tạo chữ ký cho mỗi transaction trong 1 block
    */
   this.sign = transaction => {
     return window.walletSecret
@@ -36,9 +36,9 @@ function BxbCoin() {
   }
 
   /**
-   * Tạo 1 block
+   * Tạo 1 block giao dịch
    */
-  this.createBlock = data => {
+  this.createTransaction = data => {
     for (let transaction of data) {
       if (transaction.from) {
         transaction.sign = this.sign(transaction)
@@ -46,14 +46,19 @@ function BxbCoin() {
     }
 
     return {
-      prevHash: this.chain[this.chain.length - 1].hash,
       time: Date.now(),
       data
     }
   }
 
+  this.createBlock = data => {
+    console.log(data)
+    data.prevHash = this.chain[this.chain.length - 1].hash
+    window.bxbCoin.mempool.push(data)
+  }
+
   /**
-   * Mint
+   * Đào 1 block
    */
   this.mint = (block, address) => {
     block.hash = ''
@@ -73,7 +78,7 @@ function BxbCoin() {
   }
 
   /**
-   * Thêm vào blockchain
+   * Khối được chấp thuận sẽ được thêm vào blockchain và xóa khỏi mempool
    */
   this.addToChain = block => {
     let prevBlock = this.chain[this.chain.length - 1]
