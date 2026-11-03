@@ -2,6 +2,7 @@ const User = require('./../models/user')
 const jwt = require('jsonwebtoken')
 
 module.exports = async (socket, next) => {
+  
   // const token = socket.handshake.auth.token
   //
   // try {
