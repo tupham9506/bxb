@@ -53,10 +53,15 @@ jobs:
           echo "Creating tag: $TAG"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Create and push tag
+      - name: Create GitHub Release
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          git tag "$TAG"
-          git push origin "$TAG"
-          echo "Pushed tag $TAG on $(git rev-parse --short HEAD)"
+          # Creates the tag on master AND a Release whose body is the
+          # auto-generated "What's Changed" list of merged PRs.
+          gh release create "$TAG" \
+            --target master \
+            --title "$TAG" \
+            --generate-notes
+          echo "Created release $TAG on $(git rev-parse --short HEAD)"
